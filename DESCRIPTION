@@ -1,0 +1,13 @@
+Package: predicts
+Type: Package
+Title: Spatial prediction
+Version: 0.0-1
+Date: 2019-09-28
+Depends: R (>= 3.2.0), terra
+Suggests: jsonlite
+Author: Robert J. Hijmans
+Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
+Description: Functions for spatial predictive modeling.
+License: GPL (>=3)
+LazyLoad: yes
+URL: http://rspatial.org/terra/sdm/
