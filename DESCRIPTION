@@ -1,9 +1,9 @@
 Package: predicts
 Type: Package
 Title: Spatial prediction
-Version: 0.0-1
-Date: 2019-09-28
-Depends: R (>= 3.2.0), terra
+Version: 0.0-3
+Date: 2019-11-16
+Depends: R (>= 3.1.0), terra
 Suggests: jsonlite
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
