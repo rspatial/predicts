@@ -2,10 +2,10 @@
 
 \docType{methods}
 
-\alias{biovars}
-\alias{biovars,matrix,matrix,matrix-method}
-\alias{biovars,Raster,Raster,Raster-method}
-\alias{biovars,vector,vector,vector-method}
+\alias{bcvars}
+\alias{bcvars,matrix,matrix,matrix-method}
+\alias{bcvars,SpatRaster,SpatRaster,SpatRaster-method}
+\alias{bcvars,numeric,numeric,numeric-method}
 
 \title{bioclimatic variables}
 
@@ -14,22 +14,27 @@ Function to create 'bioclimatic variables' from monthly climate data.
 }
 
 \usage{
-biovars(prec, tmin, tmax, ...) 
+\S4method{bcvars}{SpatRaster,SpatRaster,SpatRaster}(prec, tmin, tmax, filename="", ...)
+
+\S4method{bcvars}{numeric,numeric,numeric}(prec, tmin, tmax)
+
+\S4method{bcvars}{matrix,matrix,matrix}(prec, tmin, tmax)
 }
 
 \arguments{
-  \item{prec}{vector, matrix, or RasterStack/Brick of precipitation data}
-  \item{tmin}{vector, matrix, or RasterStack/Brick of minimum temperature data}
-  \item{tmax}{vector, matrix, or RasterStack/Brick of maximum temperature data}
-  \item{...}{ Additional arguments }
+  \item{prec}{numeric vector (12 values), matrix (12 columns), or SpatRaster with monthly (12 layers) precipitation data}
+  \item{tmin}{same as \code{prec}}
+  \item{tmax}{same as \code{prec}}
+  \item{filename}{character. Output filename}
+  \item{...}{additional arguments for writing files as in \code{\link[terra]{writeRaster}}}
 }
 
 \details{
-Input data is normaly monthly. I.e. there should be 12 values (layers) for each variable, but the function should also work for e.g. weekly data (with some changes in the meaning of the output variables. E.g. #8 would then not be for a quater (3 months), but for a 3 week period). 
+Input data is normally monthly. I.e. there should be 12 values (layers) for each variable, but the function should also work for e.g. weekly data (with some changes in the meaning of the output variables. E.g. #8 would then not be for a quarter (3 months), but for a 3 week period). 
 }
 
 \value{
-Depending on the class of the input data, an object of class 'vector', 'matrix' or 'RasterBrick' with 19 variables (columns, layers)
+Same class as input, but 19 values/variables
 
 bio1 = Mean annual temperature
 
@@ -68,21 +73,18 @@ bio17 = Precipitation of driest quarter
 bio18 = Precipitation of warmest quarter
 }
 
-\author{
-Robert J. Hijmans
-}
 
 \examples{
 tmin <- c(10,12,14,16,18,20,22,21,19,17,15,12)
 tmax <- tmin + 5
 prec <- c(0,2,10,30,80,160,80,20,40,60,20,0)
-biovars(prec, tmin, tmax)
+bcvars(prec, tmin, tmax)
 
-tmn = tmx = prc = brick(nrow=1, ncol=1)
-tmn <- setValues(tmn, t(matrix(c(10,12,14,16,18,20,22,21,19,17,15,12))))
+tmn <- tmx <- prc <- rast(nrow=1, ncol=1, nlyr=12)
+values(tmn) <- t(matrix(c(10,12,14,16,18,20,22,21,19,17,15,12)))
 tmx <- tmn + 5
-prc <- setValues(prc, t(matrix(c(0,2,10,30,80,160,80,20,40,60,20,0))))
-b <- biovars(prc, tmn, tmx)
+values(prc) <- t(matrix(c(0,2,10,30,80,160,80,20,40,60,20,0)))
+b <- bcvars(prc, tmn, tmx)
 as.matrix(b)
 }
 

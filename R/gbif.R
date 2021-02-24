@@ -15,6 +15,52 @@
 # new version, using the json API
 
 
+.frbind <- function(x, ...) {
+
+	if (! inherits(x, 'data.frame') ) {
+		x <- data.frame(x)
+	}
+
+	d <- list(...)
+	if (length(d) == 0) { return(x) }
+	
+	for (i in 1:length(d)) {
+		
+		dd <- d[[i]]
+		if (! inherits(dd, 'data.frame')) {
+			dd <- data.frame(dd)
+		}
+		
+		cnx <- colnames(x)
+		cnd <- colnames(dd)
+		
+		e <- cnx[(cnx %in% cnd)]	
+		for (j in e) {
+			if (class(x[,j]) != class(dd[,j])) {
+				x[,j] <- as.character(x[,j])
+				dd[,j] <- as.character(dd[,j])
+			}
+		}
+		
+		a <- which(!cnd %in% cnx)
+		if (length(a) > 0) {
+			zz <- dd[NULL, a, drop=FALSE]
+			zz[1:nrow(x),] <- NA
+			x <- cbind(x, zz)
+		}
+
+		b <- which(!cnx %in% cnd)
+		if (length(b) > 0) {
+			zz <- x[NULL, b, drop=FALSE]
+			zz[1:nrow(dd),] <- NA
+			dd <- cbind(dd, zz)
+		}
+		
+		x <- rbind(x, dd)		
+	}
+	x
+}
+
 
 .ccodes <- function() {
 	path <- system.file(package="predicts")
@@ -25,11 +71,11 @@
 
 .getExtGBIF <- function(ext) {
 	if (!is.null(ext)) { 
-		ext <- round(extent(ext), 5)
-		global <- extent(-180,180,-90,90)
-		ex <- intersect(ext, global)
+		e <- round(ext(ext), 5)
+		global <- ext(-180,180,-90,90)
+		ex <- intersect(e, global)
 		if (!is.null(ex)) {
-			ex <- paste0('&decimalLatitude=', ex@ymin,',', ex@ymax, '&decimalLongitude=', ex@xmin, ',', ex@xmax)
+			ex <- paste0('&decimalLatitude=', ymin(e),',', ymax(e), '&decimalLongitude=', xmin(e), ',', xmax(e))
 		} else {
 			warning('invalid extent')
 		}
@@ -40,8 +86,8 @@
 } 
 
 .fixNameGBIF <- function(genus, species) {
-	genus <- trim(genus)
-	species <- trim(species)
+	genus <- trimws(genus)
+	species <- trimws(species)
 	gensp <- paste(genus, species)
 	spec <- gsub("   ", " ", species) 
 	spec <- gsub("  ", " ", spec) 	
@@ -71,7 +117,7 @@ gbif <- function(genus, species="", ext=NULL, args=NULL, geo=TRUE, removeZeros=F
 	ntries <- min(max(ntries, 1), 100)
 
 	url1 <- paste(base, "scientificname=", spec, "&limit=1", cds, ex, args, sep="")
-	test <- try (download.file(url1, tmpfile, quiet=TRUE))
+	test <- try (utils::download.file(url1, tmpfile, quiet=TRUE))
 	json <- scan(tmpfile, what="character", quiet=TRUE, sep="\n",  encoding = "UTF-8")
 	x <- jsonlite::fromJSON(json)
 	if (!download) {
@@ -115,7 +161,7 @@ gbif <- function(genus, species="", ext=NULL, args=NULL, geo=TRUE, removeZeros=F
 			message("")
 		}
 		message(paste(start-1, "-", sep=""), appendLF = FALSE) 
-		flush.console()
+		utils::flush.console()
 		tries <- 0
         #======= if download fails due to server problems, keep trying  =======#
         while (TRUE) {
@@ -126,7 +172,7 @@ gbif <- function(genus, species="", ext=NULL, args=NULL, geo=TRUE, removeZeros=F
 				breakout <- TRUE
 				break
 			}
-			test <- try (download.file(aurl, tmpfile, quiet=TRUE))
+			test <- try (utils::download.file(aurl, tmpfile, quiet=TRUE))
 			if (class(test) == "try-error") {
 				print("download failure, trying again...")
 			} else {
@@ -162,7 +208,7 @@ gbif <- function(genus, species="", ext=NULL, args=NULL, geo=TRUE, removeZeros=F
 	} else if (length(g) == 1) {
 		z <- g[[1]]
 	} else {
-		z <- do.call(raster::bind, g)
+		z <- do.call(.frbind, g)
 	}
 	cn <- colnames(z)
 	cn <- gsub("decimalLatitude", "lat", cn)

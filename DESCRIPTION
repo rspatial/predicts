@@ -1,13 +1,13 @@
 Package: predicts
 Type: Package
-Title: Spatial prediction
-Version: 0.0-3
-Date: 2019-11-16
-Depends: R (>= 3.1.0), terra
-Suggests: jsonlite
+Title: Spatial prediction tools
+Version: 0.0-4
+Date: 2020-02-23
+Depends: R (>= 3.5.0), methods, terra
+Suggests: jsonlite, disdat
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
-Description: Functions for spatial predictive modeling.
+Description: Functions for spatial predictive modeling. Especially Species Distribution Models. 
 License: GPL (>=3)
 LazyLoad: yes
 URL: http://rspatial.org/terra/sdm/

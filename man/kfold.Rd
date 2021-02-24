@@ -7,7 +7,7 @@ k-fold partitioning
 }
 
 \description{
-k-fold partitioning of a data set for model testing purposes. Each record in a matrix (or similar data structure) is randomly assigned to a group. Group numbers are between 1 and \code{k}. 
+k-fold partitioning of a data set for model testing purposes. Each record in a matrix (or similar data structure) is randomly assigned to a group. Group numbers are between 1 and \code{k}. The function assures that each fold has the same size (or as close to that as possible).
 }
 
 
@@ -31,21 +31,19 @@ Robert J. Hijmans
 
 \examples{
 
-#library(disdat)
-#data(NSWtrain)
+library(disdat)
+train <- disPo("NSW")
 ## a single species
-#srsp1 <- subset(NSWtrain, spid=='srsp1')
-#kfold(srsp1, k = 5)
+srsp1 <- subset(train, spid=="nsw01")
+kfold(srsp1, k = 5)
 
 ## all species
-#k = kfold(NSWtrain, k=5, by=NSWtrain$spid)
+k = kfold(train, k=5, by=train$spid)
 
-#k[NSWtrain$spid=='srsp1']
 ## each group has the same number of records 
 ##(except for adjustments if the number of records divided by k is not an integer) 
-#table(k[NSWtrain$spid=='srsp1'])
-#k[NSWtrain$spid=='ousp5']
 
+table(k[train$spid=="nsw01"])
 }
 
 \keyword{spatial}

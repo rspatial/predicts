@@ -19,7 +19,7 @@ gbif(genus, species="", ext=NULL, args=NULL, geo=TRUE,
 \arguments{
   \item{genus}{character. genus name}
   \item{species}{character. species name. Use '*' to download the entire genus. Append '*' to the species name to get all naming variants (e.g. with and witout species author name) and sub-taxa }
-  \item{ext}{Extent object to limit the geographic extent of the records. An extent can be created using functions like \code{\link{drawExtent}} and \code{\link{extent}}}
+  \item{ext}{Extent object to limit the geographic extent of the records. An extent can be created using functions like \code{\link[terra]{draw}} and \code{\link[terra]{ext}}}
   \item{args}{character. Additional arguments to refine the query. See query parameters in http://www.gbif.org/developer/occurrence for more details}
   \item{geo}{logical. If \code{TRUE}, only records that have a georeference (longitude and latitude values) will be downloaded}
   \item{removeZeros}{logical. If \code{TRUE}, all records that have a latitude OR longitude of zero will be removed if \code{geo==TRUE}, or set to \code{NA} if \code{geo==FALSE}. If \code{FALSE}, only records that have a latitude AND longitude that are zero will be removed or set to \code{NA}}
@@ -43,15 +43,15 @@ data frame
 \examples{
 \dontrun{
 
-gbif('solanum', download=FALSE)
-gbif('solanum', 'acaule', download=FALSE)
+gbif("solanum", download=FALSE)
+gbif("solanum", "acaule", download=FALSE)
 
-gbif('Batrachoseps', '' , down=FALSE)
-gbif('Batrachoseps', 'luciae', down=FALSE)
-g <- gbif('Batrachoseps', 'luciae', geo=TRUE)
+gbif("Batrachoseps", "" , down=FALSE)
+gbif("Batrachoseps", "luciae", down=FALSE)
+g <- gbif("Batrachoseps", "luciae", geo=TRUE)
 plot(g$lon, g$lat)
 
-gs <- gbif('Batrachoseps', 'luciae', sp=TRUE)
+gs <- gbif("Batrachoseps", "luciae", sp=TRUE)
 plot(gs)
 }
 }

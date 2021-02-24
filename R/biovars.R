@@ -41,68 +41,55 @@
 # and Expanded following the ANUCLIM manual
 # 
 
+.cv <- function(x) {
+#  R function to compute the coefficient of variation (expressed as a percentage)
+# if there is only a single value, stats::sd = NA. However, one could argue that cv =0. 
+# and NA may break the code that receives it.
+#The function returns NA if(aszero=FALSE)   else a value of 0 is returned.
+	# abs to avoid very small (or zero) mean with e.g. -5:5
+	m <- mean(abs(x))  
+	if (m == 0) {
+		return(0)
+	} else {
+		return(100 * stats::sd(x) / m)
+	}
+}
 
-if (!isGeneric("biovars")) {
-	setGeneric("biovars", function(prec, tmin, tmax, ...)
-		standardGeneric("biovars"))
+
+if (!isGeneric("bcvars")) {
+	setGeneric("bcvars", function(prec, tmin, tmax, ...)
+		standardGeneric("bcvars"))
 }	
 
 
-setMethod('biovars', signature(prec='vector', tmin='vector', tmax='vector'), 
+setMethod("bcvars", signature(prec="numeric", tmin="numeric", tmax="numeric"), 
 	function(prec, tmin, tmax) {
-		biovars(t(as.matrix(prec)), t(as.matrix(tmin)), t(as.matrix(tmax)))
+		bcvars(t(as.matrix(prec)), t(as.matrix(tmin)), t(as.matrix(tmax)))
 	}
 )
 
 
-setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'), 
-	function(prec, tmin, tmax, filename='', progress='', ...) {
+setMethod("bcvars", signature(prec="SpatRaster", tmin="SpatRaster", tmax="SpatRaster"), 
+	function(prec, tmin, tmax, filename="", ...) {
 
-	if (nlayers(prec) != 12) stop('nlayers(prec) is not 12')
-	if (nlayers(tmin) != 12) stop('nlayers(tmin) is not 12')
-	if (nlayers(tmax) != 12) stop('nlayers(tmax) is not 12')
+	if (nlyr(prec) != 12) stop("nlyr(prec) is not 12")
+	if (nlyr(tmin) != 12) stop("nlyr(tmin) is not 12")
+	if (nlyr(tmax) != 12) stop("nlyr(tmax) is not 12")
 	
 	
-	# temporary fix to avoid warning
-	compareRaster(prec, tmin, tmax)
-
-	out <- brick(prec, values=FALSE)
-	out@data@nlayers <- as.integer(19)
-	names(out) <- paste('bio', 1:19, sep="")
-	
-	filename <- trim(filename)
-	if (!canProcessInMemory(out, 18)) {
-		if (filename == '') { 
-			filename <- rasterTmpFile()
-		}
-	} 
-	if (filename == "") {
-		v <- matrix(nrow=ncell(out), ncol=19)
-	} else {
-		out <- writeStart(out, filename, ...)
-	}	
-
-	tr <- blockSize(out, n=nlayers(out)+36)
-	pb <- pbCreate(tr$n, ...)	
-	for (i in 1:tr$n) {
-		prc <- getValues(prec, tr$row[i], tr$nrows[i])
-		tmn <- getValues(tmin, tr$row[i], tr$nrows[i])
-		tmx <- getValues(tmax, tr$row[i], tr$nrows[i])
-		p <- biovars(prc, tmn, tmx)
-		if (filename != "") {
-			out <- writeValues(out, p, tr$row[i])
-		} else {
-			start <- (tr$row[i]-1) * out@ncols + 1
-			end <- (tr$row[i]+tr$nrows[i]-1) * out@ncols
-			v[start:end,] <- p
-		}
+	x <- c(prec, tmin, tmax)
+	readStart(x)
+	on.exit(readStop(x))
+	nc <- ncol(x)
+	out <- rast(prec, nlyr=19)
+	names(out) <- paste0("bio", 1:19)
+	b <- writeStart(out, filename, ...)
+	for (i in 1:b$n) {
+		d <- readValues(x, b$row[i], b$nrows[i], 1, nc, TRUE, FALSE)
+		p <- bcvars(d[,1:12], d[,13:24], d[,25:36])
+		writeValues(out, p, b$row[i], b$nrows[i])
 	}
-	
-	if (filename == "") {
-		out <- setValues(out, v)
-	} else {
-		out <- writeStop(out)
-	}	
+	writeStop(out)
 	return(out)
 }
 )
@@ -110,23 +97,23 @@ setMethod('biovars', signature(prec='Raster', tmin='Raster', tmax='Raster'),
 
 
 
-setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'), 
+setMethod("bcvars", signature(prec="matrix", tmin="matrix", tmax="matrix"), 
 	function(prec, tmin, tmax) {
 
 		if (nrow(prec) != nrow(tmin) | nrow(tmin) != nrow(tmax) ) {
-			stop('prec, tmin and tmax should have same length')
+			stop("prec, tmin and tmax should have same length")
 		}
 		
 		if (ncol(prec) != ncol(tmin) | ncol(tmin) != ncol(tmax) ) {
-			stop('prec, tmin and tmax should have same number of variables (columns)')
+			stop("prec, tmin and tmax should have same number of variables (columns)")
 		}
 		
-		# can't have missing values in a row
+		# can"t have missing values in a row
 		nas <- apply(prec, 1, function(x){ any(is.na(x)) } )
 		nas <- nas | apply(tmin, 1, function(x){ any(is.na(x)) } )
 		nas <- nas | apply(tmax, 1, function(x){ any(is.na(x)) } )
 		p <- matrix(nrow=nrow(prec), ncol=19)
-		colnames(p) = paste('bio', 1:19, sep='')
+		colnames(p) = paste("bio", 1:19, sep="")
 		if (all(nas)) { return(p) }
 		
 		prec[nas,] <- NA
@@ -148,7 +135,7 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 # P2. Mean Diurnal Range(Mean(period max-min)) 
 		p[,2] <- apply(tmax-tmin, 1, mean)
 # P4. Temperature Seasonality (standard deviation) 
-		p[,4] <- 100 * apply(tavg, 1, sd)
+		p[,4] <- 100 * apply(tavg, 1, stats::sd)
 # P5. Max Temperature of Warmest Period 
 		p[,5] <- apply(tmax,1, max)
 # P6. Min Temperature of Coldest Period 
@@ -165,7 +152,7 @@ setMethod('biovars', signature(prec='matrix', tmin='matrix', tmax='matrix'),
 		p[,14] <-  apply(prec, 1, min)
 # P15. Precipitation Seasonality(Coefficient of Variation) 
 # the "1 +" is to avoid strange CVs for areas where mean rainfaill is < 1)
-		p[,15] <- apply(prec+1, 1, cv)
+		p[,15] <- apply(prec+1, 1, .cv)
 		
 # precip by quarter (3 months)		
 		wet <- t(apply(prec, 1, window))
