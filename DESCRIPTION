@@ -1,10 +1,10 @@
 Package: predicts
 Type: Package
 Title: Spatial prediction tools
-Version: 0.0-4
-Date: 2020-02-23
+Version: 0.0-5
+Date: 2020-02-28
 Depends: R (>= 3.5.0), methods, terra
-Suggests: jsonlite, disdat
+Suggests: jsonlite, disdat, rJava
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
 Description: Functions for spatial predictive modeling. Especially Species Distribution Models. 
