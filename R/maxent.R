@@ -5,6 +5,8 @@
 
 setClass("maxent_model",
 	representation (
+		presence = "data.frame",
+		absence = "data.frame",
 		lambdas  = "vector",
 		results = "matrix",
 		path = "character",
@@ -18,80 +20,8 @@ setClass("maxent_model",
 	),
 )
 
-
-
-setClass("maxent_model_replicates",
-	representation (
-		models  = "list",
-		results = "matrix",
-		html = "character"
-	),	
-	prototype (	
-		models = list(),
-		results = as.matrix(NA),
-		html = ""
-	),
-)
-
-
-setMethod ("show" , "maxent_model_replicates", 
-	function(object) {
-		cat("class     :" , class(object), "\n")
-		cat("replicates:", length(object@models), "\n")
-		if (file.exists(object@html)) {
-			utils::browseURL( paste("file:///", object@html, sep="") )
-		} else {
-			cat("model html no longer exists\n")
-		}
-	}
-)	
-
-		
-		
-		
-
-setMethod ("show" , "maxent_model", 
-	function(object) {
-		cat("class    :" , class(object), "\n")
-		cat("variables:", colnames(object@presence), "\n")
-		# cat("lambdas\n")
-		# print(object@lambdas)
-#		pp <- nrow(object@presence)
-#		cat("\npresence points:", pp, "\n")
-#		if (pp < 5) { 
-#			print(object@presence)
-#		} else {
-#			print(object@presence[1:5,])
-#			cat("  (... ...  ...)\n")
-#			cat("\n")
-#		}
-#		pp <- nrow(object@absence)
-#		cat("\nabsence points:", pp, "\n")
-#		if (pp < 5) {
-#			print(object@absence)
-#		} else {
-#			print(object@absence[1:5,])
-#			cat("  (... ...  ...)\n")
-#			cat("\n")
-#		}
-#		cat("\nmodel fit\n")
-#		print(object@results)
-#		cat("\n")
-
-		if (file.exists(object@html)) {
-			utils::browseURL( paste("file:///", object@html, sep="") )
-		} else {
-			cat("output html file no longer exists\n")
-		}
-	}
-)	
-
-
-if (!isGeneric("maxentropy")) {
-	setGeneric("maxentropy", function(x, p, ...)
-		standardGeneric("maxentropy"))
+if (!isGeneric("maxentropy")) { setGeneric("maxentropy", function(x, p, ...) standardGeneric("maxentropy"))
 }	
-
 
 .getMeVersion <- function(...) {}
 
@@ -143,10 +73,10 @@ setMethod("maxentropy", signature(x="missing", p="missing"),
 	if (inherits(x, "SpatVector")) {
 		x <- geom(x)[,c("x", "y")]
 	} 
-	if (inherits(x, "matrix")) {
-		x <- data.frame(x)
+	if (inherits(x, "data.frame")) {
+		x <- as.matrix(x)
 	}
-	if (! class(x) == "data.frame" ) {
+	if (!inherits(x, "matrix" )) {
 		stop("data should be  a matrix, data.frame, or SpatVector")
 	}
 	if (dim(x)[2] != 2) {
@@ -167,12 +97,6 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 		} else {
 			pv <- extract(x, p)
 		}
-		if (is.null(dim(pv))) {
-			pv <- matrix(pv, ncol=1)
-			colnames(pv) <- names(x)
-		}
-		pv <- data.frame(pv)
-		
 
 		lpv <- nrow(pv)
 		pv <- stats::na.omit(pv)
@@ -185,15 +109,9 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 			}
 		} 
 		
-		if (! is.null(a) ) {
+		if (!is.null(a) ) {
 			a <- .getMatrix(a)
 			av <- extract(x, a)
-			if (is.null(dim(av))) {
-				av <- matrix(av, ncol=1)
-				colnames(av) <- names(x)
-			}
-			av <- data.frame(av)
-			
 			avr <- nrow(av)
 			av <- stats::na.omit(av)
 			nas <- length(as.vector(attr(av, "na.action")))
@@ -210,29 +128,12 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 				nbg <- 10000 
 			} else {
 				if (nbg < 100) {
-					stop("number of background points is very low")
+					stop("number of background points too low")
 				} else if (nbg < 1000) {
 					warning("number of background points is very low")
 				}
 			}
-
-			if (nlyr(x) > 1) {
-				xy <- background( rast(x,1), nbg, p, warn=0 )
-			} else {
-				xy <- background(x, nbg, p, warn=0 )			
-			}
-			av <- extract(x, xy)
-			if (is.null(dim(av))) {
-				av <- matrix(av, ncol=1)
-				colnames(av) <- names(x)
-			}
-			av <- data.frame(av)
-			
-			
-			av <- stats::na.omit(av)
-			if (nrow(av) == 0) {
-				stop("could not get valid background point values; is there a layer with only NA values?")
-			}
+			av <- spatSample(x, nbg, "random", na.rm=TRUE, warn=FALSE)
 			if (nrow(av) < 100) {
 				stop("only got:", nrow(av), "random background point values; is there a layer with many NA values?")
 			}
@@ -245,11 +146,11 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 
 		x <- rbind(pv, av)
 		
-		if (!is.null(factors)) {
-			for (f in factors) {
-				x[,f] <- factor(x[,f])
-			}
-		}
+		#if (!is.null(factors)) {
+		#	for (f in factors) {
+		#		x[,f] <- factor(x[,f])
+		#	}
+		#}
 		
 		p <- c(rep(1, nrow(pv)), rep(0, nrow(av)))
 		maxentropy(x, p, ...)	
@@ -259,7 +160,7 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 
 .getreps <- function(args) {
 	if (is.null(args)) { return(1) } 
-	args <- trim(args)
+	args <- trimws(args)
 	i <- which(substr(args,1,10) == "replicates")
 	if (! isTRUE(i > 0)) {
 		return(1)
@@ -272,10 +173,10 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 
 
 
-setMethod("maxentropy", signature(x="data.frame", p="vector"), 
+setMethod("maxentropy", signature(x="data.frame", p="numeric"), 
 	function(x, p, args=NULL, path, silent=FALSE, ...) {
 	
-		stopifnot(maxentropy())
+		stopifnot(maxentropy(silent=TRUE))
 
 		x <- cbind(p, x)
 		x <- stats::na.omit(x)
@@ -284,12 +185,12 @@ setMethod("maxentropy", signature(x="data.frame", p="vector"),
 		p <- x[,1]
 		x <- x[, -1 ,drop=FALSE]
 
-		factors <- NULL
-		for (i in 1:ncol(x)) {
-			if (class(x[,i]) == "factor") {
-				factors <- c(factors, colnames(x)[i])
-			}
-		}
+		#factors <- NULL
+		#for (i in 1:ncol(x)) {
+		#	if (class(x[,i]) == "factor") {
+		#		factors <- c(factors, colnames(x)[i])
+		#	}
+		#}
 		
 		if (!missing(path)) {
 			path <- trim(path)
@@ -313,7 +214,6 @@ setMethod("maxentropy", signature(x="data.frame", p="vector"),
 		me <- new("maxent_model")
 		me@presence <- pv
 		me@absence <- av
-		me@hasabsence <- TRUE
 		me@path <- dirout
 
 		pv <- cbind(data.frame(species="species"), x=1:nrow(pv), y=1:nrow(pv), pv)
@@ -330,6 +230,7 @@ setMethod("maxentropy", signature(x="data.frame", p="vector"),
 		replicates <- .getreps(args) 
 		args <- c("-z", args)
 
+		factors = NULL
 		if (is.null(factors)) {
 			str <- rJava::.jcall(mxe, "S", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, args)) 
 		} else {
@@ -419,17 +320,19 @@ setMethod("maxentropy", signature(x="data.frame", p="vector"),
 	}
 }
 
-setMethod("plot", signature(x="maxent_model", y="missing"), 
-	function(x, sort=TRUE, main="Variable contribution", xlab="Percentage", ...) {
+setMethod("plot", signature(x="maxent_model"), 
+	function(x, ...) {
 		r <- x@results
 		rnames <- rownames(r)
 		i <- grep(".contribution", rnames)
 		r <- r[i, ]
 		names(r) <- gsub(".contribution", "", names(r))
-		if (sort) {
-			r <- sort(r)
-		}
-		graphics::dotchart(r, main=main, xlab=xlab, ...)
+		r <- sort(r)
+		dots <- list(...)
+		if (is.null(dots$main)) dots$main="Variable contribution"
+		if (is.null(dots$xlab)) dots$xlab="Percentage"
+		dots$x <- r
+		do.call(graphics::dotchart, dots)
 		invisible(r)
 	}
 )
@@ -438,7 +341,7 @@ setMethod("plot", signature(x="maxent_model", y="missing"),
 
 setMethod("predict", signature(object="maxent_model_replicates"), 
 	function(object, x, ext=NULL, filename="", args="", ...) {
-		stopifnot(maxentropy())
+		stopifnot(maxentropy(silent=TRUE))
 
 		n <- length(object@models)
 		if (filename != "") {
@@ -492,7 +395,7 @@ setMethod("predict", signature(object="maxent_model_replicates"),
 setMethod("predict", signature(object="maxent_model"), 
 	function(object, x, ext=NULL, args="", filename="", ...) {
 
-		stopifnot(maxentropy())
+		stopifnot(maxentropy(silent=TRUE))
 
 		args <- c(args, "")
 		lambdas <- paste(object@lambdas, collapse="\n")
@@ -533,7 +436,7 @@ setMethod("predict", signature(object="maxent_model"),
 		for (i in 1:b$n) {
 			rowvals <- terra::readValues(x, b$row[i], b$nrows[i], 1, ncol(x), TRUE, FALSE)
 			p <- .maxent_predict(object, mxe, args, rowvals)
-			terra::writeValues(out, res, b$row[i], b$nrows[i])
+			terra::writeValues(out, p, b$row[i], b$nrows[i])
 		}
 		terra::writeStop(out)
 		return(out)
@@ -543,3 +446,74 @@ setMethod("predict", signature(object="maxent_model"),
 
 
 
+
+
+
+setClass("maxent_model_replicates",
+	representation (
+		models  = "list",
+		results = "matrix",
+		html = "character"
+	),	
+	prototype (	
+		models = list(),
+		results = as.matrix(NA),
+		html = ""
+	),
+)
+
+
+		
+		
+
+setMethod ("show" , "maxent_model", 
+	function(object) {
+		cat("class    :" , class(object), "\n")
+		cat("variables:", colnames(object@presence), "\n")
+		# cat("lambdas\n")
+		# print(object@lambdas)
+#		pp <- nrow(object@presence)
+#		cat("\npresence points:", pp, "\n")
+#		if (pp < 5) { 
+#			print(object@presence)
+#		} else {
+#			print(object@presence[1:5,])
+#			cat("  (... ...  ...)\n")
+#			cat("\n")
+#		}
+#		pp <- nrow(object@absence)
+#		cat("\nabsence points:", pp, "\n")
+#		if (pp < 5) {
+#			print(object@absence)
+#		} else {
+#			print(object@absence[1:5,])
+#			cat("  (... ...  ...)\n")
+#			cat("\n")
+#		}
+#		cat("\nmodel fit\n")
+#		print(object@results)
+#		cat("\n")
+
+		if (file.exists(object@html)) {
+			utils::browseURL( paste("file:///", object@html, sep="") )
+		} else {
+			cat("output html file no longer exists\n")
+		}
+	}
+)	
+
+
+
+setMethod ("show" , "maxent_model_replicates", 
+	function(object) {
+		cat("class     :" , class(object), "\n")
+		cat("replicates:", length(object@models), "\n")
+		if (file.exists(object@html)) {
+			utils::browseURL( paste("file:///", object@html, sep="") )
+		} else {
+			cat("model html no longer exists\n")
+		}
+	}
+)	
+
+		

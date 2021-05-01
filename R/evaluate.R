@@ -4,13 +4,12 @@
 # Licence GPL v3
 
 
-
 RMSE <- function(obs, prd, na.rm=FALSE) {
 	sqrt(mean((obs - prd)^2, na.rm=na.rm))
 }
 
-RMSE_null <- function(obs, pred, na.rm=FALSE) {
-	r <- RMSE(obs, pred, na.rm=na.rm)
+RMSE_null <- function(obs, prd, na.rm=FALSE) {
+	r <- RMSE(obs, prd, na.rm=na.rm)
 	null <- RMSE(obs, mean(obs))
 	(null - r) / null
 }
@@ -39,7 +38,18 @@ setClass("paModelEvaluation",
 
 
 
-pa_evaluate <- function(p, a, tr) {
+pa_evaluate <- function(p, a, model=NULL, x=NULL, tr, ...) {
+	if (!is.null(model)) {
+		if (is.null(x)) {
+			p <- predict(model, p, ...)
+			a <- predict(model, a, ...)
+		} else {
+			p <- extract(x, p)
+			p <- predict(model, p, ...)
+			a <- extract(x, a)
+			a <- predict(model, a, ...)
+		}
+	}
 	p <- stats::na.omit(p)
 	a <- stats::na.omit(a)
 	np <- length(p)
@@ -143,6 +153,24 @@ pa_evaluate <- function(p, a, tr) {
 
 	return(xc)
 }
+
+
+setMethod ("show" , "paModelEvaluation", 
+	function(object) {
+		cat("@stats\n")
+		print(round(object@stats, 3))
+		cat("\n")
+		cat("@thresholds\n")
+		print(round(object@thresholds, 3))
+		cat("\n")
+		cat("@tr_stats\n")
+		x <- rbind(head(object@tr_stats, 4), tail(object@tr_stats, 3))
+		x <- round(x, 2)
+		x[4, ] <- "..."
+		print(x)		
+	}
+)	
+
 
 
 

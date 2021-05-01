@@ -43,10 +43,14 @@ setMethod("envelope", signature(x="data.frame"),
 		if (any(i)) {
 			y <- x[,i,drop=FALSE]
 			x <- x[,!i,drop=FALSE]
-			y <- lapply(y, function(i) as.character(as.vector(na.omit(i))))
+			y <- lapply(y, function(i) as.character(as.vector(stats::na.omit(i))))
 			y <- y[sapply(y, length) > 0]
 			if (length(y) > 0) { 
-				y <- lapply(y, function(i) as.data.frame(table(i)))
+				y <- lapply(y, function(i) { 
+					i <- as.data.frame(table(i))
+					i[,2] <- i[,2]/max(i[,2])
+					i
+				})	
 				nv <- length(y)
 				nms <- names(y)
 				bc@factor <- y
@@ -54,7 +58,7 @@ setMethod("envelope", signature(x="data.frame"),
 		}
 		haveNumeric = ncol(x) > 0
 		if (haveNumeric) {
-			x <- lapply(x, function(i) sort(as.vector(na.omit(i))))
+			x <- lapply(x, function(i) sort(as.vector(stats::na.omit(i))))
 			x <- x[sapply(x, length) > 1]
 			nv <- nv + length(x)
 			nms <- c(names(x), nms)
@@ -75,7 +79,7 @@ setMethod("envelope", signature(x="data.frame"),
 
 setMethod("envelope", signature(x="SpatRaster"), 
 	function(x, p, ...) {
-		m <- extract(x, p)
+		m <- extract(x, p)[,-1]
 		envelope(data.frame(m), ...)
 	}
 )
@@ -84,7 +88,7 @@ setMethod("envelope", signature(x="SpatRaster"),
 
 setMethod("show", signature(object="envelope_model"), 
 	function(object) {
-		str(object)
+		utils::str(object)
 	}
 )
 

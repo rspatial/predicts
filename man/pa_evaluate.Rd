@@ -1,5 +1,7 @@
 \name{pa_evaluate}
 
+\alias{paModelEvaluation-class}
+
 \alias{pa_evaluate}
 \alias{plot,paModelEvaluation,ANY-method}
 
@@ -11,17 +13,20 @@ Evaluation of models with presence/absence data. Given a vector of presence and 
 }
 
 \usage{
-pa_evaluate(p, a, tr)
+pa_evaluate(p, a, model=NULL, x=NULL, tr, ...)
 }
  
 \arguments{
-  \item{p}{predictions for presence points}   
-  \item{a}{predictions for absence (or background) points}
+  \item{p}{either (1) predictions for presence points  (\code{model} and \code{x} are not \code{NULL}); or (2) predictor values for presence points (\code{model} is not \code{NULL}, \code{x} is \code{NULL}; or locations for presence points (\code{model} and \code{x} are not \code{NULL})}   
+  \item{a}{as above for absence or background points}
+  \item{model}{A fitted model used to make predictions}
+  \item{x}{SpatRaster used to extract predictor values from}
   \item{tr}{Optional. a vector of threshold values to use for computing the confusion matrices}
+  \item{...}{Additional arguments passed on to \code{predict(model,...)}}
 }
 
 \value{
-An object of \code{paModelEvaluation-class}
+pa_ModelEvaluation object
 }
 
 

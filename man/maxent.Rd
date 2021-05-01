@@ -1,9 +1,13 @@
 \name{maxentropy}
 
+\alias{maxent_model-class}
+\alias{maxent_model_replicates-class}
+
 \alias{maxentropy}
 
 \alias{maxentropy,missing,missing-method}
 \alias{maxentropy,SpatRaster,ANY-method}
+\alias{maxentropy,SpatRaster,SpatVector-method}
 \alias{maxentropy,data.frame,numeric-method}
 
 \alias{maxentropy_model-class}
@@ -58,7 +62,7 @@ If the function is run without any arguments a boolean value is returned (\code{
 }
 
 \seealso{
-\code{\link[dismo]{predict}}
+\code{\link[predicts]{predict}}
 }
 
 \author{Steven Phillips and Robert J. Hijmans}
@@ -84,28 +88,27 @@ maxentropy()
 if (maxentropy()) {
 
 # get predictor variables
-fnames <- list.files(path=paste(system.file(package="dismo"), '/ex', sep=''), 
-              pattern='grd', full.names=TRUE )
-predictors <- stack(fnames)
-#plot(predictors)
+f <- system.file("ex/bio.tif", package="predicts")
+preds <- rast(f)
+#plot(preds)
 
 # file with presence points
-occurence <- paste(system.file(package="dismo"), '/ex/bradypus.csv', sep='')
-occ <- read.table(occurence, header=TRUE, sep=',')[,-1]
+occurence <- system.file("/ex/bradypus.csv", package="predicts")
+occ <- read.csv(occurence)[,-1]
 
 # witholding a 20% sample for testing 
-fold <- kfold(occ, k=5)
+fold <- make_folds(occ, k=5)
 occtest <- occ[fold == 1, ]
 occtrain <- occ[fold != 1, ]
 
-# fit model, biome is a categorical variable
-me <- maxentropy(predictors, occtrain, factors='biome')
+# fit model
+me <- maxentropy(preds, occtrain)
 
 # see the maxentropy results in a browser:
 me
 
 # use "args"
-# me2 <- maxentropy(predictors, occtrain, factors='biome', args=c("-J", "-P"))
+# me2 <- maxentropy(preds, occtrain, factors='biome', args=c("-J", "-P"))
 
 # plot showing importance of each variable
 plot(me)
@@ -114,10 +117,10 @@ plot(me)
 # response(me)
 
 # predict to entire dataset
-r <- predict(me, predictors) 
+r <- predict(me, preds) 
 
 # with some options:
-# r <- predict(me, predictors, args=c("outputformat=raw"), progress='text', 
+# r <- predict(me, preds, args=c("outputformat=raw"), progress='text', 
 #      filename='maxentropy_prediction.grd')
 
 plot(r)
@@ -125,15 +128,15 @@ points(occ)
 
 #testing
 # background data
-bg <- background(predictors, 1000)
+bg <- background(preds, 1000)
 
 #simplest way to use 'evaluate'
-e1 <- pa_evaluate(me, p=occtest, a=bg, x=predictors)
+e1 <- pa_evaluate(me, p=occtest, a=bg, x=preds)
 
 # alternative 1
 # extract values
-pvtest <- data.frame(extract(predictors, occtest))
-avtest <- data.frame(extract(predictors, bg))
+pvtest <- data.frame(extract(preds, occtest))
+avtest <- data.frame(extract(preds, bg))
 
 e2 <- pa_evaluate(me, p=pvtest, a=avtest)
 

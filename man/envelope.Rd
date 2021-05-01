@@ -63,20 +63,23 @@ Robert J. Hijmans
 
 
 \examples{
-logo <- rast(system.file("ex/logo.tif", package="terra"))
-#presence data
-pts <- matrix(c(48.24, 48.24, 47.99, 52.88, 49.53, 46.18, 54.17, 69.62, 83.79, 85.34, 74.26, 83.79, 95.13, 84.57, 66.28, 41.8, 25.83, 3.94, 18.88, 17.33, 7.05, 13.65, 26.09, 28.54, 39.1, 44.57, 51.17, 56.26, 46.27, 38.16, 30.62, 21.95, 34.39, 59.66, 69.84, 73.23, 63.24, 45.89, 43.25, 28.36), ncol=2)
+# file with presence points
+fsp <- system.file("/ex/bradypus.csv", package="predicts")
+occ <- read.csv(fsp)[,-1]
 
-v <- extract(logo, pts)
-bc <- envelope(v)
+#predictors
+f <- system.file("ex/bio.tif", package="predicts")
+preds <- rast(f)[[c(1,7,9)]]
 
-d <- logo[2360:2370]
+v <- extract(preds, occ)
+bc <- envelope(v[,-1])
+
+d <- preds[18324:18374]
 predict(bc, d)
 
-p1 <- predict(bc, logo)
-p2 <- predict(bc, logo, tails=c('both', 'low', 'high'))
+p1 <- predict(bc, preds)
+p2 <- predict(bc, preds, tails=c("both", "low", "high"))
 
-#or
 }
 
 \keyword{spatial}
