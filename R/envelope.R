@@ -10,7 +10,6 @@ if (!isGeneric("envelope")) {
 }	
 
 
-
 setClass("envelope_model",
 	representation (
 		numeric = "list",
@@ -23,7 +22,6 @@ setClass("envelope_model",
 		return(TRUE)
 	}
 )
-
 
 
 setMethod("envelope", signature(x="matrix"), 
@@ -58,7 +56,7 @@ setMethod("envelope", signature(x="data.frame"),
 		}
 		haveNumeric = ncol(x) > 0
 		if (haveNumeric) {
-			x <- lapply(x, function(i) sort(as.vector(stats::na.omit(i))))
+			x <- lapply(x, function(i) as.vector(stats::na.omit(i)))
 			x <- x[sapply(x, length) > 1]
 			nv <- nv + length(x)
 			nms <- c(names(x), nms)
@@ -98,7 +96,7 @@ setMethod("show", signature(object="envelope_model"),
 
 
 .percRank <- function(x, y, tail) {
-
+	x <- sort(x)
 	b <- apply(y, 1, FUN=function(z)sum(x<z))
 	t <- apply(y, 1, FUN=function(z)sum(x==z))
 	r <- (b + 0.5 * t)/length(x)
@@ -149,27 +147,24 @@ function(object, x, tails=NULL, extent=NULL, filename="", ...) {
 	mincomp[tails=="high"] <- -Inf
 	maxcomp <- object@max
 	maxcomp[tails=="low"] <- Inf
+
+	if (! all(ln %in% names(x)) ) {
+		stop("missing variables in x")
+	}
 	
-	if (! (extends(class(x), "SpatRaster")) ) {
-		if (! all(ln %in% colnames(x)) ) {
-			stop("missing variables in x")
-		}
+	if (! (inherits(x, "SpatRaster")) ) {
 		x <- x[, ln ,drop=FALSE]
 		return(.envelope_predict(object, tails, mincomp, maxcomp, x))
 
 	} else {
-		rasternames <- names(x)
-		if (! all(ln %in% rasternames )) {
-			stop('missing variables in SpatRaster')
-		}
-		if ((length(ln) < length(rasternames))) {
+		if ((length(ln) < length(nms))) {
 			x <- x[[ln]]
 		}
 		if (!is.null(extent)) {
 			x <- terra::crop(x, ext)
 		}
 		out <- terra::rast(x, nlyr=1)
-		names(out)  <- "maxent"
+		names(out)  <- "envelope"
 		ncols <- terra::ncol(out)
 		if (!terra::readStart(x)) { stop(x@ptr$messages$getError()) }
 		on.exit(terra::readStop(x))
@@ -188,9 +183,7 @@ function(object, x, tails=NULL, extent=NULL, filename="", ...) {
 
 setMethod("plot", signature(x="envelope_model", y='missing'), 
 	function(x, a=1, b=2, p=0.9, ...) {
-		
-		d <- x@numeric
-	
+			
 		myquantile <- function(x, p) {
 			p <- min(1, max(0, p))
 			x <- sort(as.vector(stats::na.omit(x)))
@@ -206,6 +199,7 @@ setMethod("plot", signature(x="envelope_model", y='missing'),
 		p <- min(1,  max(0, p))
 		if (p > 0.5) p <- 1 - p
 		p <- p / 2
+		d <- as.data.frame(x@numeric)
 		prd <- predict(x, d)
 		i <- prd > p & prd < (1-p)
 		plot(d[,a], d[,b], xlab=colnames(d)[a], ylab=colnames(d)[b], cex=0)
