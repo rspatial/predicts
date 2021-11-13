@@ -4,7 +4,7 @@
 # Licence GPL v3
 
 
-.background <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, cellnumbers=FALSE, tryf=3, warn=2) {
+backgroundSample <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, cellnumbers=FALSE, tryf=3, warn=2) {
 	
 	mask <- rast(mask)[[1]]	
 	tryf <- max(round(tryf[1]), 1)

@@ -1,7 +1,7 @@
 
 # adapted from from R package pycno
 # Chris Brunsdon <christopher.brunsdon at nuim.ie>
-# GPL-2 | GPL-3 [expanded from: GPL (≥ 2)]
+# GPL (≥ 2)
 
 
 # x = SpatRaster
@@ -21,10 +21,8 @@ pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
 		x <- x * r + (1-r) * pad
 		for (i in uzones) {
 			z <- (zones == i)
-			correct <- pops[i]/sum(x[z])
-			x[z] <- pmax(0, x[z]*correct)
-			correct <- (pops[i] - sum(x[z]))/sum(z)
-			x[z] <- x[z] + correct
+			x[z] <- pmax(0, x[z] * pops[i]/sum(x[z]))
+			x[z] <- x[z] + (pops[i] - sum(x[z]))/sum(z)
 		}
 		x
 	}
