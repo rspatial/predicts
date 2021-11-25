@@ -28,12 +28,12 @@ if (!isGeneric("maxentropy")) { setGeneric("maxentropy", function(x, p, ...) sta
 setMethod("maxentropy", signature(x="missing", p="missing"), 
 	function(x, p, silent=FALSE, ...) {
 
-		if (is.null(getOption("dismo_rJavaLoaded"))) {
+		if (is.null(getOption("predicts_rJavaLoaded"))) {
 			# to avoid trouble on macs
 			Sys.setenv(NOAWT=TRUE)
 			if ( requireNamespace("rJava") ) {
-				rJava::.jpackage("dismo")
-				options(dismo_rJavaLoaded=TRUE)
+				rJava::.jpackage("predicts")
+				options(predicts_rJavaLoaded=TRUE)
 			} else {
 				if (!silent) {
 					cat("Cannot load rJava\n")			
@@ -42,7 +42,7 @@ setMethod("maxentropy", signature(x="missing", p="missing"),
 			}
 		}
 
-		if (is.null(getOption("dismo_maxent"))) {
+		if (is.null(getOption("predicts_maxent"))) {
 			mxe <- rJava::.jnew("meversion") 
 			v <- try(rJava::.jcall(mxe, "S", "meversion"), silent=TRUE)
 			if (class(v) == "try-error") {
@@ -56,7 +56,7 @@ setMethod("maxentropy", signature(x="missing", p="missing"),
 				}
 				return(FALSE)
 			}
-			options(dismo_maxent=v)
+			options(predicts_maxent=v)
 		} else {
 			v = getOption("dismo_maxent")
 		}
@@ -71,7 +71,7 @@ setMethod("maxentropy", signature(x="missing", p="missing"),
 
 .getMatrix <- function(x) {
 	if (inherits(x, "SpatVector")) {
-		x <- geom(x)[,c("x", "y")]
+		x <- geom(x)[,c("x", "y"), drop=FALSE]
 	} 
 	if (inherits(x, "data.frame")) {
 		x <- as.matrix(x)
@@ -287,6 +287,7 @@ setMethod("maxentropy", signature(x="data.frame", p="numeric"),
 			me@lambdas <- unlist( readLines( paste(dirout, "/species.lambdas", sep="") ) )
 			d <- t(utils::read.csv(paste(dirout, "/maxentResults.csv", sep="") ))
 			d <- d[-1, ,drop=FALSE]
+			d[d=="na"] <- NA
 			dd <- matrix(as.numeric(d))
 			rownames(dd) <- rownames(d)
 			me@results <- dd
