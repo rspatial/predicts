@@ -54,9 +54,9 @@ pwd_sample <- function(fixed, sample, reference, tr=0.33, nearest=TRUE, n=1, lon
 	n <- round(n)
 	stopifnot(n >= 1)
 	
-	if (inherits(fixed, 'SpatVector')) fixed <- coords(fixed)
-	if (inherits(sample, 'SpatVector')) sample <- coords(sample)
-	if (inherits(reference, 'SpatVector')) reference <- coords(reference)
+	if (inherits(fixed, 'SpatVector')) fixed <- crds(fixed)
+	if (inherits(sample, 'SpatVector')) sample <- crds(sample)
+	if (inherits(reference, 'SpatVector')) reference <- crds(reference)
 	fixed     <- as.matrix(fixed)[,1:2]
 	sample    <- as.matrix(sample)[,1:2]
 	reference <- as.matrix(reference)[,1:2]

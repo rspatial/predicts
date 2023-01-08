@@ -2,7 +2,7 @@
 # January 2010
 # License GPL3
 
-make_folds <- function(x, k=5, by=NULL) {
+folds <- function(x, k=5, by=NULL) {
 
 	singlefold <- function(obs, k) {
 		if (k==1) {

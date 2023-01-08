@@ -1,34 +1,34 @@
-\name{maxentropy}
+\name{MaxEnt}
 
-\alias{maxent_model-class}
-\alias{maxent_model_replicates-class}
+\alias{MaxEnt_model-class}
+\alias{MaxEnt_model_replicates-class}
 
-\alias{maxentropy}
+\alias{MaxEnt}
 
-\alias{maxentropy,missing,missing-method}
-\alias{maxentropy,SpatRaster,ANY-method}
-\alias{maxentropy,SpatRaster,SpatVector-method}
-\alias{maxentropy,data.frame,numeric-method}
+\alias{MaxEnt,missing,missing-method}
+\alias{MaxEnt,SpatRaster,ANY-method}
+\alias{MaxEnt,SpatRaster,SpatVector-method}
+\alias{MaxEnt,data.frame,numeric-method}
 
-\alias{maxentropy_model-class}
-\alias{maxentropy_model_replicates-class}
+\alias{MaxEnt_model-class}
+\alias{MaxEnt_model_replicates-class}
 
-\title{maxentropy}
+\title{MaxEnt}
 
 \description{
 Build a "maxent" (Maximum Entropy) species distribution model (see references below). The function uses environmental data for locations of known presence and for a large number of 'background' locations. Environmental data can be extracted from raster files. The result is a model object that can be used to predict the suitability of other locations, for example, to predict the entire range of a species. 
 
 Background points are sampled randomly from the cells that are not \code{NA} in the first predictor variable, unless background points are specified with argument \code{a}. 
 
-This function uses the maxentropy species distribution model software by Phillips, Dudik and Schapire.
+This function uses the MaxEnt species distribution model software by Phillips, Dudik and Schapire.
 }
 
 \usage{
-\S4method{maxentropy}{SpatRaster,SpatVector}(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, ...)
+\S4method{MaxEnt}{SpatRaster,SpatVector}(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, ...)
 
-\S4method{maxentropy}{data.frame,numeric}(x, p, args=NULL, path, silent=FALSE, ...)
+\S4method{MaxEnt}{data.frame,numeric}(x, p, args=NULL, path, silent=FALSE, ...)
 
-\S4method{maxentropy}{missing,missing}(x, p, silent=FALSE, ...)
+\S4method{MaxEnt}{missing,missing}(x, p, silent=FALSE, ...)
 }
 
 \arguments{
@@ -43,11 +43,11 @@ If \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 \item{nbg}{Number of background points to use. These are sampled randomly from the cells that are not \code{NA} in the first predictor variable. Ignored if background points are specified with argument \code{a}} 
 
 
-\item{args}{character. Additional argument that can be passed to maxentropy. See the maxentropy help for more information. The R maxentropy function only uses the arguments relevant to model fitting. There is no point in using args='outputformat=raw' when *fitting* the model; but you can use arguments relevant for *prediction* when using the predict function. Some other arguments do not apply at all to the R implementation. An example is 'outputfiletype', because the 'predict' function has its own 'filename' argument for that}
+\item{args}{character. Additional argument that can be passed to MaxEnt. See the MaxEnt help for more information. The R MaxEnt function only uses the arguments relevant to model fitting. There is no point in using args='outputformat=raw' when *fitting* the model; but you can use arguments relevant for *prediction* when using the predict function. Some other arguments do not apply at all to the R implementation. An example is 'outputfiletype', because the 'predict' function has its own 'filename' argument for that}
 
 \item{removeDuplicates}{Boolean. If \code{TRUE}, duplicate presence points (that fall in the same grid cell) are removed}
 
-\item{path}{character. Optional argument to set where you want the maxentropy output files to be stored. This allows you to permanently keep these files. If not supplied the maxentropy files will be stored in a temporary file. These are the files that are shown in a browser when typing the model name or when you use "show(model)"}
+\item{path}{character. Optional argument to set where you want the MaxEnt output files to be stored. This allows you to permanently keep these files. If not supplied the MaxEnt files will be stored in a temporary file. These are the files that are shown in a browser when typing the model name or when you use "show(model)"}
 
 \item{silent}{Boolean. If \code{TRUE} a message is printed}
 
@@ -56,9 +56,9 @@ If \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 
 
 \value{
-An object of class 'maxent_model'. Or a 'maxent_model_replicates' object if you use 'replicates=' as part of the \code{args} argument. 
+An object of class 'MaxEnt_model'. Or a 'MaxEnt_model_replicates' object if you use 'replicates=' as part of the \code{args} argument. 
 
-If the function is run without any arguments a boolean value is returned (\code{TRUE} if maxentropy.jar was found).
+If the function is run without any arguments a boolean value is returned (\code{TRUE} if MaxEnt.jar was found).
 }
 
 \seealso{
@@ -69,23 +69,23 @@ If the function is run without any arguments a boolean value is returned (\code{
 
 \references{
 
-\url{https://biodiversityinformatics.amnh.org/open_source/maxentropy/}
+\url{https://biodiversityinformatics.amnh.org/open_source/MaxEnt/}
 
 Steven J. Phillips, Miroslav Dudik, Robert E. Schapire, 2004.  A maximum entropy approach to species distribution modeling. Proceedings of the Twenty-First International Conference on Machine Learning. p. 655-662.
 
 Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entropy modeling of species geographic distributions. Ecological Modelling 190:231-259. 
 
-Jane Elith, Steven J. Phillips, Trevor Hastie, Miroslav Dudik, Yung En Chee, Colin J. Yates, 2011. A statistical explanation of maxentropy for ecologists. Diversity and Distributions 17:43-57. \url{https://dx.doi.org/10.1111/j.1472-4642.2010.00725.x}
+Jane Elith, Steven J. Phillips, Trevor Hastie, Miroslav Dudik, Yung En Chee, Colin J. Yates, 2011. A statistical explanation of MaxEnt for ecologists. Diversity and Distributions 17:43-57. \url{https://dx.doi.org/10.1111/j.1472-4642.2010.00725.x}
 }
 
 \examples{
 
 \donttest{
 
-# test if you can use maxentropy 
-maxentropy()
+# test if you can use MaxEnt 
+MaxEnt()
 
-if (maxentropy()) {
+if (MaxEnt()) {
 
 # get predictor variables
 f <- system.file("ex/bio.tif", package="predicts")
@@ -97,18 +97,18 @@ occurence <- system.file("/ex/bradypus.csv", package="predicts")
 occ <- read.csv(occurence)[,-1]
 
 # witholding a 20% sample for testing 
-fold <- make_folds(occ, k=5)
+fold <- folds(occ, k=5)
 occtest <- occ[fold == 1, ]
 occtrain <- occ[fold != 1, ]
 
 # fit model
-me <- maxentropy(preds, occtrain)
+me <- MaxEnt(preds, occtrain)
 
-# see the maxentropy results in a browser:
+# see the MaxEnt results in a browser:
 me
 
 # use "args"
-# me2 <- maxentropy(preds, occtrain, factors='biome', args=c("-J", "-P"))
+# me2 <- MaxEnt(preds, occtrain, factors='biome', args=c("-J", "-P"))
 
 # plot showing importance of each variable
 plot(me)
@@ -121,7 +121,7 @@ r <- predict(me, preds)
 
 # with some options:
 # r <- predict(me, preds, args=c("outputformat=raw"), progress='text', 
-#      filename='maxentropy_prediction.grd')
+#      filename='MaxEnt_prediction.grd')
 
 plot(r)
 points(occ)

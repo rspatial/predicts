@@ -157,7 +157,7 @@ function(object, x, tails=NULL, extent=NULL, filename="", ...) {
 		return(.envelope_predict(object, tails, mincomp, maxcomp, x))
 
 	} else {
-		if ((length(ln) < length(nms))) {
+		if ((length(ln) < length(x))) {
 			x <- x[[ln]]
 		}
 		if (!is.null(extent)) {

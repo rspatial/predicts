@@ -3,7 +3,7 @@
 # Version 0.1
 # Licence GPL v3
 
-setClass("maxent_model",
+setClass("MaxEnt_model",
 	representation (
 		presence = "data.frame",
 		absence = "data.frame",
@@ -20,12 +20,12 @@ setClass("maxent_model",
 	),
 )
 
-if (!isGeneric("maxentropy")) { setGeneric("maxentropy", function(x, p, ...) standardGeneric("maxentropy"))
+if (!isGeneric("MaxEnt")) { setGeneric("MaxEnt", function(x, p, ...) standardGeneric("MaxEnt"))
 }	
 
 .getMeVersion <- function(...) {}
 
-setMethod("maxentropy", signature(x="missing", p="missing"), 
+setMethod("MaxEnt", signature(x="missing", p="missing"), 
 	function(x, p, silent=FALSE, ...) {
 
 		if (is.null(getOption("predicts_rJavaLoaded"))) {
@@ -47,7 +47,7 @@ setMethod("maxentropy", signature(x="missing", p="missing"),
 			v <- try(rJava::.jcall(mxe, "S", "meversion"), silent=TRUE)
 			if (class(v) == "try-error") {
 				if (!silent) {
-					cat("maxent_model is missing or incompatible with your version of Java\n")
+					cat("MaxEnt_model is missing or incompatible with your version of Java\n")
 				}
 				return(FALSE)
 			} else if (v == "3.3.3a") {
@@ -61,7 +61,7 @@ setMethod("maxentropy", signature(x="missing", p="missing"),
 			v = getOption("dismo_maxent")
 		}
 		if (!silent) {
-			cat("This is maxent_model version", v, "\n")
+			cat("This is MaxEnt_model version", v, "\n")
 		}
 		invisible(TRUE)
 	}
@@ -87,7 +87,7 @@ setMethod("maxentropy", signature(x="missing", p="missing"),
 } 
 
 
-setMethod("maxentropy", signature(x="SpatRaster", p="ANY"), 
+setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"), 
 	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
 
 		p <- .getMatrix(p)
@@ -153,7 +153,7 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 		#}
 		
 		p <- c(rep(1, nrow(pv)), rep(0, nrow(av)))
-		maxentropy(x, p, ...)	
+		MaxEnt(x, p, ...)	
 	}
 )
 
@@ -173,10 +173,10 @@ setMethod("maxentropy", signature(x="SpatRaster", p="ANY"),
 
 
 
-setMethod("maxentropy", signature(x="data.frame", p="numeric"), 
+setMethod("MaxEnt", signature(x="data.frame", p="numeric"), 
 	function(x, p, args=NULL, path, silent=FALSE, ...) {
 	
-		stopifnot(maxentropy(silent=TRUE))
+		stopifnot(MaxEnt(silent=TRUE))
 
 		x <- cbind(p, x)
 		x <- stats::na.omit(x)
@@ -211,7 +211,7 @@ setMethod("maxentropy", signature(x="data.frame", p="numeric"),
 		
 		pv <- x[p==1, ,drop=FALSE]
 		av <- x[p==0, ,drop=FALSE]
-		me <- new("maxent_model")
+		me <- new("MaxEnt_model")
 		me@presence <- pv
 		me@absence <- av
 		me@path <- dirout
@@ -321,7 +321,7 @@ setMethod("maxentropy", signature(x="data.frame", p="numeric"),
 	}
 }
 
-setMethod("plot", signature(x="maxent_model"), 
+setMethod("plot", signature(x="MaxEnt_model"), 
 	function(x, ...) {
 		r <- x@results
 		rnames <- rownames(r)
@@ -340,9 +340,9 @@ setMethod("plot", signature(x="maxent_model"),
 
 
 
-setMethod("predict", signature(object="maxent_model_replicates"), 
+setMethod("predict", signature(object="MaxEnt_model_replicates"), 
 	function(object, x, ext=NULL, filename="", args="", ...) {
-		stopifnot(maxentropy(silent=TRUE))
+		stopifnot(MaxEnt(silent=TRUE))
 
 		n <- length(object@models)
 		if (filename != "") {
@@ -393,10 +393,10 @@ setMethod("predict", signature(object="maxent_model_replicates"),
 
 
 
-setMethod("predict", signature(object="maxent_model"), 
+setMethod("predict", signature(object="MaxEnt_model"), 
 	function(object, x, ext=NULL, args="", filename="", ...) {
 
-		stopifnot(maxentropy(silent=TRUE))
+		stopifnot(MaxEnt(silent=TRUE))
 
 		args <- c(args, "")
 		lambdas <- paste(object@lambdas, collapse="\n")
@@ -450,7 +450,7 @@ setMethod("predict", signature(object="maxent_model"),
 
 
 
-setClass("maxent_model_replicates",
+setClass("MaxEnt_model_replicates",
 	representation (
 		models  = "list",
 		results = "matrix",
@@ -467,7 +467,7 @@ setClass("maxent_model_replicates",
 		
 		
 
-setMethod ("show" , "maxent_model", 
+setMethod ("show" , "MaxEnt_model", 
 	function(object) {
 		cat("class    :" , class(object), "\n")
 		cat("variables:", colnames(object@presence), "\n")
@@ -505,7 +505,7 @@ setMethod ("show" , "maxent_model",
 
 
 
-setMethod ("show" , "maxent_model_replicates", 
+setMethod ("show" , "MaxEnt_model_replicates", 
 	function(object) {
 		cat("class     :" , class(object), "\n")
 		cat("replicates:", length(object@models), "\n")

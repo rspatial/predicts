@@ -1,9 +1,9 @@
 Package: predicts
 Type: Package
-Title: Spatial prediction tools
-Description: Functions for spatial predictive modeling. Especially Species Distribution Models. 
-Version: 0.1-3
-Date: 2021-11-25
+Title: Spatial Prediction Tools
+Description: Methods for spatial predictive modeling, especially for spatial distribution models. Methods include the MaxEnt model. 
+Version: 0.1-4
+Date: 2023-01-08
 Depends: R (>= 3.5.0), methods, terra
 Suggests: disdat, rJava
 Authors@R: c(
@@ -14,5 +14,5 @@ Authors@R: c(
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
 License: GPL (>=3)
 LazyLoad: yes
-URL: http://rspatial.org/terra/sdm/
+URL: https://rspatial.org/terra/sdm/
 BugReports: https://github.com/rspatial/predicts/issues/

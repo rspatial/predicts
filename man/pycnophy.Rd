@@ -47,7 +47,7 @@ Pycnophylatic interpolation has the property that the sum of the estimated value
 f <- system.file("ex/lux.shp", package="terra")
 v <- vect(f)
 r <- rast(v, resolution = 0.01)
-p <- pycnophy(r, v, "POP", converge=3)
+p <- pycnophy(r, v, "POP", converge=3, verbose=FALSE)
 plot(p); lines(v)
 }
 

@@ -11,7 +11,7 @@
 pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
 
 
-	s1d <- function(s) unclass(filter(s,c(0.5,0,0.5)))
+	s1d <- function(s) unclass(stats::filter(s,c(0.5,0,0.5)))
 
 	pycno <- function(x, r, zones, uzones, pops) {
 		mval <- mean(x)
@@ -57,12 +57,12 @@ pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
 		xx <- pycno(xx, r, zones, uzs, pops)
 		if (verbose) {
 			cat(sprintf("Maximum Change: %12.5f - will stop at %12.5f\n", max(abs(old.x - xx)), stopper))
-			flush.console()
+			utils::flush.console()
 		}
 		if (max(abs(old.x - xx)) < stopper) break 
 	}
 
-	y <- setValues(x, xx)
+	y <- setValues(x, as.vector(xx))
 	mask(y, x)
 } 
 

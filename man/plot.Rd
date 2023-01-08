@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{plot,envelope_model,missing-method}
-\alias{plot,maxent_model,ANY-method}
+\alias{plot,MaxEnt_model,ANY-method}
 
 \title{
 Plot predictor values 
@@ -16,7 +16,7 @@ Plot predictor values for occurrence (presence and absence) data in a model obje
 \usage{
 \S4method{plot}{envelope_model,missing}(x, a = 1, b = 2, p = 0.9, ...)
 
-\S4method{plot}{maxent_model,ANY}(x, y, ...)
+\S4method{plot}{MaxEnt_model,ANY}(x, y, ...)
 }
 
 \arguments{

@@ -1,6 +1,6 @@
-\name{make_folds}
+\name{folds}
 
-\alias{make_folds}
+\alias{folds}
 
 \title{
 Make folds for k-fold partitioning
@@ -12,7 +12,7 @@ k-fold partitioning of a data set for model testing purposes. Each record in a m
 
 
 \usage{
-make_folds(x, k=5, by)
+folds(x, k=5, by)
 }
  
 \arguments{
@@ -35,10 +35,10 @@ library(disdat)
 train <- disPo("NSW")
 ## a single species
 srsp1 <- subset(train, spid=="nsw01")
-make_folds(srsp1, k = 5)
+folds(srsp1, k = 5)
 
 ## all species
-k = make_folds(train, k=5, by=train$spid)
+k = folds(train, k=5, by=train$spid)
 
 ## each group has the same number of records 
 ##(except for adjustments if the number of records divided by k is not an integer) 
