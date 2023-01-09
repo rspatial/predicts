@@ -86,7 +86,7 @@ pa_evaluate <- function(p, a, model=NULL, x=NULL, tr, ...) {
 	
 	cr <- try( stats::cor.test(c(p,a), c(rep(1, length(p)), rep(0, length(a))) ), silent=TRUE )
 	corc <- pcor <- NA
-	if (class(cr) != "try-error") {
+	if (!inherits(cr, "try-error")) {
 		corc <- cr$estimate
 		pcor <- cr$p.value
 	} 
@@ -222,3 +222,18 @@ setMethod("plot", signature(x="paModelEvaluation"),
 		}
 	}	
 )
+
+
+if (!isGeneric("threshold")) {
+	setGeneric("threshold", function(x, ...)
+		standardGeneric("threshold"))
+}	
+
+
+setMethod('threshold', signature(x='paModelEvaluation'),
+	function(x) {
+		x@thresholds
+	}
+)
+
+

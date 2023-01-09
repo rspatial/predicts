@@ -46,9 +46,7 @@ backgroundSample <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, cell
 	nn <- max(nn, 10)
 
 	nn <- min(ncell(mask2), nn)
-	cells <- spatSample(mask2, nn, xy=TRUE)
-	xy <- xyFromCell(mask2, cells)
-	cells <- cellFromXY(mask, xy)
+	cells <- as.vector(spatSample(mask2, nn, cells=TRUE))
 	if (hasValues(mask)) {
 		vals <- cbind(cells, extract(mask, cells))
 		cells <- stats::na.omit(vals)[,1]

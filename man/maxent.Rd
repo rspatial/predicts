@@ -69,18 +69,16 @@ If the function is run without any arguments a boolean value is returned (\code{
 
 \references{
 
-\url{https://biodiversityinformatics.amnh.org/open_source/MaxEnt/}
+\url{https://biodiversityinformatics.amnh.org/open_source/maxent/}
 
 Steven J. Phillips, Miroslav Dudik, Robert E. Schapire, 2004.  A maximum entropy approach to species distribution modeling. Proceedings of the Twenty-First International Conference on Machine Learning. p. 655-662.
 
 Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entropy modeling of species geographic distributions. Ecological Modelling 190:231-259. 
 
-Jane Elith, Steven J. Phillips, Trevor Hastie, Miroslav Dudik, Yung En Chee, Colin J. Yates, 2011. A statistical explanation of MaxEnt for ecologists. Diversity and Distributions 17:43-57. \url{https://dx.doi.org/10.1111/j.1472-4642.2010.00725.x}
+Jane Elith, Steven J. Phillips, Trevor Hastie, Miroslav Dudik, Yung En Chee, Colin J. Yates, 2011. A statistical explanation of MaxEnt for ecologists. Diversity and Distributions 17:43-57. \doi{j.1472-4642.2010.00725.x}
 }
 
 \examples{
-
-\donttest{
 
 # test if you can use MaxEnt 
 MaxEnt()
@@ -127,8 +125,8 @@ plot(r)
 points(occ)
 
 #testing
-# background data
-bg <- background(preds, 1000)
+# background sample
+bg <- backgroundSample(preds, 1000)
 
 #simplest way to use 'evaluate'
 e1 <- pa_evaluate(me, p=occtest, a=bg, x=preds)
@@ -151,7 +149,6 @@ e3
 threshold(e3)
 
 plot(e3, 'ROC')
-}
 }
 
 }

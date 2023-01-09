@@ -1,7 +1,7 @@
 
 # adapted from from R package pycno
 # Chris Brunsdon <christopher.brunsdon at nuim.ie>
-# GPL (≥ 2)
+# GPL >= 2
 
 
 # x = SpatRaster

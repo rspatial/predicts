@@ -45,7 +45,7 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 		if (is.null(getOption("predicts_maxent"))) {
 			mxe <- rJava::.jnew("meversion") 
 			v <- try(rJava::.jcall(mxe, "S", "meversion"), silent=TRUE)
-			if (class(v) == "try-error") {
+			if (inherits(v, "try-error")) {
 				if (!silent) {
 					cat("MaxEnt_model is missing or incompatible with your version of Java\n")
 				}
@@ -370,9 +370,9 @@ setMethod("predict", signature(object="MaxEnt_model_replicates"),
 	x <- x[,variables,drop=FALSE]
 	if (inherits(x, "data.frame")) {
 		for (i in 1:ncol(x)) {
-			if (class(x[,i]) == "factor") {
+			if (inherits(x[,i], "factor")) {
 				x[,i] <- as.numeric(as.character(x[,i]))
-			} else if (class(x[,i]) == "character") {
+			} else if (inherits(x[,i], "character")) {
 				x[,i] <- as.numeric(x[,i])
 			}
 		}
