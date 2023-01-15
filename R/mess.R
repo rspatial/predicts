@@ -50,7 +50,7 @@ setMethod("mess", signature(x="SpatRaster"),
 			}
 		} else {
 			if (full) {
-				nlyr(out) <- nl+1)
+				nlyr(out) <- nl+1
 				names(out) <- c(nms, "mess")
 				b <- writeStart(out, filename, ...)
 				for (i in 1:b$n) {
@@ -71,9 +71,8 @@ setMethod("mess", signature(x="SpatRaster"),
 			}
 		}
 		writeStop(out)
+		out
 	}	
-	out
-}
 )
 
 setMethod("mess", signature(x="data.frame"), 

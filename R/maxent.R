@@ -20,6 +20,22 @@ setClass("MaxEnt_model",
 	),
 )
 
+
+setClass("MaxEnt_model_replicates",
+	representation (
+		models  = "list",
+		results = "matrix",
+		html = "character"
+	),	
+	prototype (	
+		models = list(),
+		results = as.matrix(NA),
+		html = ""
+	),
+)
+
+
+
 if (!isGeneric("MaxEnt")) { setGeneric("MaxEnt", function(x, p, ...) standardGeneric("MaxEnt"))
 }	
 
@@ -443,27 +459,6 @@ setMethod("predict", signature(object="MaxEnt_model"),
 		return(out)
 	}
 )
-
-
-
-
-
-
-
-setClass("MaxEnt_model_replicates",
-	representation (
-		models  = "list",
-		results = "matrix",
-		html = "character"
-	),	
-	prototype (	
-		models = list(),
-		results = as.matrix(NA),
-		html = ""
-	),
-)
-
-
 		
 		
 
