@@ -80,6 +80,8 @@ Jane Elith, Steven J. Phillips, Trevor Hastie, Miroslav Dudik, Yung En Chee, Col
 
 \examples{
 
+\donttest{
+
 # test if you can use MaxEnt 
 MaxEnt()
 
@@ -88,7 +90,7 @@ if (MaxEnt()) {
 # get predictor variables
 f <- system.file("ex/bio.tif", package="predicts")
 preds <- rast(f)
-#plot(preds)
+plot(preds)
 
 # file with presence points
 occurence <- system.file("/ex/bradypus.csv", package="predicts")
@@ -106,7 +108,7 @@ me <- MaxEnt(preds, occtrain)
 me
 
 # use "args"
-# me2 <- MaxEnt(preds, occtrain, factors='biome', args=c("-J", "-P"))
+me2 <- MaxEnt(preds, occtrain, factors='biome', args=c("-J", "-P"))
 
 # plot showing importance of each variable
 plot(me)
@@ -118,8 +120,7 @@ plot(me)
 r <- predict(me, preds) 
 
 # with some options:
-# r <- predict(me, preds, args=c("outputformat=raw"), progress='text', 
-#      filename='MaxEnt_prediction.grd')
+r <- predict(me, preds, args=c("outputformat=raw"))
 
 plot(r)
 points(occ)
@@ -149,6 +150,7 @@ e3
 threshold(e3)
 
 plot(e3, 'ROC')
+}
 }
 
 }

@@ -45,7 +45,6 @@ r[] <- 1
 set.seed(0)
 sam <- spatSample(r, 50, xy=TRUE, as.points=TRUE)
 
-par(mfrow=c(1,2))
 plot(sam, pch='x')
 points(ref, col='red', pch=18, cex=2)
 points(fix, col='blue', pch=20, cex=2)

@@ -36,7 +36,7 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 				options(predicts_rJavaLoaded=TRUE)
 			} else {
 				if (!silent) {
-					cat("Cannot load rJava\n")			
+					message("Cannot load rJava")			
 				}
 				return(FALSE)
 			}
@@ -47,12 +47,12 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 			v <- try(rJava::.jcall(mxe, "S", "meversion"), silent=TRUE)
 			if (inherits(v, "try-error")) {
 				if (!silent) {
-					cat("MaxEnt_model is missing or incompatible with your version of Java\n")
+					message("MaxEnt_model is missing or incompatible with your version of Java")
 				}
 				return(FALSE)
 			} else if (v == "3.3.3a") {
 				if (!silent) {
-					cat("This is not a compatible version of Maxent\n")
+					message("This is not a compatible version of Maxent")
 				}
 				return(FALSE)
 			}
@@ -61,7 +61,7 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 			v = getOption("dismo_maxent")
 		}
 		if (!silent) {
-			cat("This is MaxEnt_model version", v, "\n")
+			message(paste("This is MaxEnt_model version", v))
 		}
 		invisible(TRUE)
 	}

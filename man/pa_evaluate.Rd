@@ -100,7 +100,6 @@ e
 
 e@stats
 
-par(mfrow=c(2,2))
 plot(e, "ROC")
 plot(e, "TPR")
 plot(e, "boxplot")

@@ -61,7 +61,6 @@ pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
 		}
 		if (max(abs(old.x - xx)) < stopper) break 
 	}
-
 	y <- setValues(x, as.vector(xx))
 	mask(y, x)
 } 
