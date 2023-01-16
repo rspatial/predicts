@@ -22,13 +22,12 @@
 
 .messix <- function(p,v) {
 # a little bit different, no negative values.
-	a <- ecdf(v)(p)
+	a <- stats::ecdf(v)(p)
 	a[a>0.5] <- 1-a[a>0.5]
 	200 * a
 }
 
 
-if (!isGeneric("mess")) { setGeneric("mess", function(x, ...) standardGeneric("mess")) }	
 
 setMethod("mess", signature(x="SpatRaster"), 
 	function(x, v, full=FALSE, filename="", ...) {
@@ -40,7 +39,7 @@ setMethod("mess", signature(x="SpatRaster"),
 			v <- extract(v, x)
 		}
 		v <- stats::na.omit(v)
-		if (nrow(v) < 2)) {
+		if (nrow(v) < 2) {
 			stop("insufficient number of reference points")
 		}
 		stopifnot(NCOL(v) == nlyr(x))
@@ -94,6 +93,7 @@ setMethod("mess", signature(x="data.frame"),
 			rmess <- apply(x, 1, min, na.rm=TRUE)
 			if (full) {
 				out <- data.frame(x, rmess)
+				nms <- paste0(names(x), "_mess")
 				names(out) <- c(nms, "mess")
 				out
 			} else {

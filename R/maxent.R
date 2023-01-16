@@ -35,10 +35,6 @@ setClass("MaxEnt_model_replicates",
 )
 
 
-
-if (!isGeneric("MaxEnt")) { setGeneric("MaxEnt", function(x, p, ...) standardGeneric("MaxEnt"))
-}	
-
 .getMeVersion <- function(...) {}
 
 setMethod("MaxEnt", signature(x="missing", p="missing"), 

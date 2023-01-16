@@ -17,7 +17,7 @@
 \arguments{
   \item{x}{SpatRaster or data.frame}
   \item{v}{matrix or data.frame containing the reference values; each column should correspond to one layer of the SpatRaster object. If \code{x} is a SpatRaster, it can also be a SpatVector with reference locations (points)}
-  \item{full}{logical. If \code{FALSE} a RasterLayer with the MESS values is returned. If \code{TRUE}, a RasterBrick is returned with \code{n} layers corresponding to the layers of the input Raster object and an additional layer with the MESS values}
+  \item{full}{logical. If \code{FALSE} a SpatRaster with the MESS values is returned. If \code{TRUE}, a RasterBrick is returned with \code{n} layers corresponding to the layers of the input SpatRaster and an additional layer with the MESS values}
   \item{filename}{character. Output filename (optional)}
   \item{...}{additional arguments as for \code{\link{writeRaster}}}
 }
