@@ -22,7 +22,7 @@ Make predictions with models defined in the \code{predicts} package
 }
 
 \arguments{
-  \item{object}{model defined in this pacakge (e.g. "envelope_model" and "maxent_model")}
+  \item{object}{model defined in this package (e.g. "envelope_model" and "maxent_model")}
   \item{x}{data to predict to. Either a data.frame or a SpatRaster}
   \item{tails}{character. You can use this to ignore the left or right tail of the percentile distribution for a variable. If supplied, tails should be a character vector with a length equal to the number of variables used in the model. Valid values are "both" (the default), "low" and "high". For example, if you have a variable x with an observed distribution between 10 and 20 and you are predicting the bioclim value for a value of 25, the default result would be zero (outside of all observed values); but if you use tail='low', the high (right) tail is ignored and the value returned will be 1. }
   \item{args}{Pass *prediction* arguments (options) to the maxent software. See \code{\link[predicts]{maxent}}}
@@ -33,11 +33,11 @@ Make predictions with models defined in the \code{predicts} package
 
 
 \value{
-A RasterLayer or, (if \code{x} is a matrix), a vector. 
+SpatRaster or vector (if \code{x} is a data.frame). 
 }
 
 \seealso{
-\code{\link[terra]{predict}} function in the 'terra' package for spatial predictions with GLM, GAM, BRT, randomForest, etc.
+\code{\link[terra]{predict}} function in the "terra" package for spatial predictions with glm, randomForest, etc.
 }
 
 
