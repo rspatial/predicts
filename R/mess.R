@@ -3,7 +3,7 @@
 
 
 .messi3 <- function(p,v) {
-	v <- stats::na.omit(v)
+	
 	f <- 100*findInterval(p, sort(v)) / length(v)
 	minv <- min(v)
 	maxv <- max(v)
@@ -33,10 +33,20 @@ if (!isGeneric("mess")) { setGeneric("mess", function(x, ...) standardGeneric("m
 setMethod("mess", signature(x="SpatRaster"), 
 	function(x, v, full=FALSE, filename="", ...) {
 
+		if (inherits(v, "SpatVector")) {
+			if (geomtype(p) != "points") {
+				stop("SpatVector v must have points geometry")
+			}
+			v <- extract(v, x)
+		}
+		v <- stats::na.omit(v)
+		if (nrow(v) < 2)) {
+			stop("insufficient number of reference points")
+		}
 		stopifnot(NCOL(v) == nlyr(x))
+
 		out <- rast(x)
 		nl <- nlyr(x)
-		filename <- trim(filename)
 		nms <- paste0(names(x), "_mess")
 		readStart(x)
 		on.exit(readStop(x))
@@ -54,7 +64,7 @@ setMethod("mess", signature(x="SpatRaster"),
 				names(out) <- c(nms, "mess")
 				b <- writeStart(out, filename, ...)
 				for (i in 1:b$n) {
-					vv <- terra::readValues(x, b$row[i], b$nrows[i])
+					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
 					vv <- sapply(1:ncol(v), function(i) .messi3(vv[,i], v[,i]))
 					m <- apply(vv, 1, min, na.rm=TRUE)
 					terra::writeValues(out, cbind(vv, m), b$row[i], b$nrows[i])
@@ -63,7 +73,7 @@ setMethod("mess", signature(x="SpatRaster"),
 				names(out) <- "mess"
 				b <- writeStart(out, filename, ...)
 				for (i in 1:b$n) {
-					vv <- terra::readValues(x, b$row[i], b$nrows[i])
+					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
 					vv <- sapply(1:ncol(v), function(i) .messi3(vv[,i], v[,i]))
 					m <- apply(vv, 1, min, na.rm=TRUE)
 					terra::writeValues(out, m, b$row[i], b$nrows[i])
