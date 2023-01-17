@@ -35,10 +35,15 @@ setMethod("lines", signature(x="HullModel"),
 
 
 .k_convexHulls <- function(xy, k) {
+
+	if (k > (nrow(xy) / 2)) {
+		stop('too many clusters (there should be at least twice as many points)')
+	}
+
 	cl <- stats::kmeans(xy, k, 100)$cluster
 	clusters <- unique(cl)
 	if (any(table(cl) < 3)) {
-		stop("too many clusters")
+		stop("too many clusters (cluster with less than three points found)")
 	}
 	h <- vector(mode="list", length=k)
 	xy <- data.frame(xy)

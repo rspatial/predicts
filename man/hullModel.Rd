@@ -1,10 +1,16 @@
 \name{hullModel}
 
+\alias{HullModel-class}
+
 \alias{hullModel}
 \alias{hullModel,SpatVector-method}
 \alias{hullModel,matrix-method}
 \alias{hullModel,data.frame-method}
-\alias{HullModel-class}
+
+\alias{geometry}
+\alias{geometry,HullModel-method}
+
+\alias{plot,HullModel,missing-method}
 
 
 \title{hull model}
