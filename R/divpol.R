@@ -68,6 +68,3 @@ stripper <- function(x, f=c(1/3, 2/3), vertical=TRUE){
 }
 
 
-#library(terra)
-#pol <- vect(paste("POLYGON((-180 -20, -140 55, 10 0, -140 -60, -180 -20),","(-150 -20, -100 -10, -110 20, -150 -20))"), crs="+proj=utm +zone=1")
-#s = stripper(pol, seq(.1, .9, .1))

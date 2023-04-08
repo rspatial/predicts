@@ -36,6 +36,7 @@ SpatVector
 \examples{
 f <- system.file("ex/lux.shp", package="terra")
 v <- aggregate(vect(f))
+set.seed(33)
 d1 <- divider(v, 10)
 plot(d1)
 
@@ -43,8 +44,9 @@ d2 <- divider(v, 100)
 boxplot(expanse(d2, "km"))
 
 x <- stripper(v, seq(0.1, 0.9, 0.1))
-expanse(x)
-plot(x)
+round(expanse(x,"km"), 1)
+plot(x, col=rainbow(12))
+
 }
 
 \keyword{ spatial }
