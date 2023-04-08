@@ -77,7 +77,7 @@ setMethod("envelope", signature(x="data.frame"),
 
 setMethod("envelope", signature(x="SpatRaster"), 
 	function(x, p, ...) {
-		m <- extract(x, p)[,-1]
+		m <- extract(x, p, ID=FALSE)
 		envelope(data.frame(m), ...)
 	}
 )

@@ -48,7 +48,7 @@ backgroundSample <- function(mask, n, p, ext=NULL, extf=1.1, excludep=TRUE, cell
 	nn <- min(ncell(mask2), nn)
 	cells <- as.vector(spatSample(mask2, nn, cells=TRUE))
 	if (hasValues(mask)) {
-		vals <- cbind(cells, extract(mask, cells))
+		vals <- cbind(cells, terra::extract(mask, cells))
 		cells <- stats::na.omit(vals)[,1]
 	}
 		

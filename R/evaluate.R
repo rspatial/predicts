@@ -44,9 +44,9 @@ pa_evaluate <- function(p, a, model=NULL, x=NULL, tr, ...) {
 			p <- predict(model, p, ...)
 			a <- predict(model, a, ...)
 		} else {
-			p <- extract(x, p)
+			p <- terra::extract(x, p)
 			p <- predict(model, p, ...)
-			a <- extract(x, a)
+			a <- terra::extract(x, a)
 			a <- predict(model, a, ...)
 		}
 	}
