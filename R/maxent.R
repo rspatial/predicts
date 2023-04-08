@@ -205,7 +205,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		#}
 		
 		if (!missing(path)) {
-			path <- trim(path)
+			path <- trimws(path)
 			dir.create(path, recursive=TRUE, showWarnings=FALSE)
 			if (!file.exists(path)) {
 				stop("cannot create output directory: ", path)
@@ -358,7 +358,7 @@ setMethod("predict", signature(object="MaxEnt_model_replicates"),
 
 		n <- length(object@models)
 		if (filename != "") {
-			filename <- trim(filename)
+			filename <- trimws(filename)
 			fxt <- tools::file_ext(filename)
 			filename <- tools::file_path_sans_ext(filename)
 			fname <- paste(filename, "_", 1:n, fxt, sep="")
