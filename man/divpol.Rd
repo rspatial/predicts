@@ -1,26 +1,29 @@
 \name{divide_polygons}
 
-\alias{divide_polygons}
+\alias{divider}
+\alias{stripper}
 
 \title{
 Divide polygons into equal area parts
 }
 
 \description{
-Divide a \code{SpatVector} of polygons into \code{n} compact and approximately equal area parts.
-The results are not deterministic so you should use \code{\link{set.seed}} to be able to reproduce your results.
+\code{stripper} divides polygons into horizontal or vertical strips of a specified relative size.
 
-If you get a warning about non-convergence, you can increase the number of iterations used with additional argument \code{iter.max}
+\code{divider} divides a \code{SpatVector} of polygons into \code{n} compact and approximately equal area parts. The results are not deterministic so you should use \code{\link{set.seed}} to be able to reproduce your results. If you get a warning about non-convergence, you can increase the number of iterations used with additional argument \code{iter.max}
 }
 
 \usage{
-divide_polygons(x, n, ...)
+divider(x, n, ...)
+stripper(x, f=c(1/3, 2/3), vertical=TRUE)
 }
 
 \arguments{
   \item{x}{SpatVector of polygons}
   \item{n}{positive integer. The number of parts requested}
   \item{...}{additional arguments such as \code{iter.max} passed on to \code{\link{kmeans}}}
+  \item{f}{numeric vector of fractions. These must be > 0 and < 1, and in ascending order}
+  \item{vertical}{logical. If \code{TRUE} the strips are vertical}
 }
 
 
@@ -28,11 +31,21 @@ divide_polygons(x, n, ...)
 SpatVector 
 }
 
+\author{stripper was derived from a function by Barry Rowlingson}
+
 \examples{
 f <- system.file("ex/lux.shp", package="terra")
 v <- aggregate(vect(f))
-d1 <- divide_polygons(v, 10)
-d2 <- divide_polygons(v, 100)
+d1 <- divider(v, 10)
+plot(d1)
+
+d2 <- divider(v, 100)
+boxplot(expanse(d2, "km"))
+
+x <- stripper(v, seq(0.1, 0.9, 0.1))
+expanse(x)
+plot(x)
 }
 
 \keyword{ spatial }
+
