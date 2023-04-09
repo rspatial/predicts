@@ -255,7 +255,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 	
 		if (replicates > 1) {
 		
-			mer <- new("MaxEntReplicates")
+			mer <- new("MaxEnt_model_replicates")
 			d <- t(utils::read.csv(paste(dirout, "/maxentResults.csv", sep="") ))
 			d1 <- d[1,]
 			d <- d[-1, ,drop=FALSE]
