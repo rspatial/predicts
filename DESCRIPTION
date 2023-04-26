@@ -10,7 +10,8 @@ Authors@R: c(
 	person("Robert J.", "Hijmans", role = c("cre", "aut"),  
 			email = "r.hijmans@gmail.com", comment = c(ORCID = "0000-0001-5872-2872")),
 	person("Steven", "Phillips", role = "ctb"),
-	person("Chris", "Brunsdon", role = "ctb"))
+	person("Chris", "Brunsdon", role = "ctb"),
+	person("Barry", "Rowlingson", role = "ctb"))
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
 License: GPL (>=3)
 LazyLoad: yes
