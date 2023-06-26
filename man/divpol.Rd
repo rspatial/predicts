@@ -14,13 +14,15 @@ Divide polygons into equal area parts
 }
 
 \usage{
-divider(x, n, ...)
+divider(x, n, env=NULL, alpha=1, ...)
 stripper(x, f=c(1/3, 2/3), vertical=TRUE)
 }
 
 \arguments{
   \item{x}{SpatVector of polygons}
   \item{n}{positive integer. The number of parts requested}
+  \item{env}{SpatRaster with environmental data}
+  \item{alpha}{numeric. One or two numbers that act as weights for the x and y coordinates}
   \item{...}{additional arguments such as \code{iter.max} passed on to \code{\link{kmeans}}}
   \item{f}{numeric vector of fractions. These must be > 0 and < 1, and in ascending order}
   \item{vertical}{logical. If \code{TRUE} the strips are vertical}
