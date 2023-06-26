@@ -8,10 +8,10 @@
 # v = SpatVector 
 # pop = field in v, or vector
   
-pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
+pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=FALSE) {
 
 
-		s1d <- function(s) unclass(stats::filter(s,c(0.5,0,0.5)))
+		s1d <- function(s) unclass(stats::filter(s, c(0.5,0,0.5)))
 
 		pycno <- function(x, r, zones, uzones, pops) {
 			mval <- mean(x)
@@ -35,17 +35,19 @@ pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
 		} else {
 			stopifnot(length(pop) == nrow(v))
 		}
+		pop <- pmax(0, pop)
+#		i <- pop > 0
+#		i[is.na(i)] <- FALSE
+#		if (!all(i)) {
+#			if (any(i)) {
+#				v <- v[i,]
+#				pop <- pop[i]
+#			} else {
+#				stop("none of the values in 'pop' is larger than zero")
+#			}
+#		}
+
 	# add zero for NAs
-		i <- pop > 0
-		i[is.na(i)] <- FALSE
-		if (!all(i)) {
-			if (any(i)) {
-				v <- v[i,]
-				pop <- pop[i]
-			} else {
-				stop("none of the values in 'pop' is larger than zero")
-			}
-		}
 		pops <- c(pop, 0)
 
 	# zones
@@ -61,7 +63,7 @@ pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
 			xx[zone.set] <- pops[i]/sum(zone.set)
 		}
 
-		stopper <- max(xx) * 10^(-converge)
+		stopper <- max(xx, na.rm=TRUE) * 10^(-converge)
 		repeat {
 			old.x <- xx
 			xx <- pycno(xx, r, zones, uzs, pops)
@@ -69,7 +71,7 @@ pycnophy <- function(x, v, pop, r=0.2, converge=3, verbose=TRUE) {
 				cat(sprintf("Maximum Change: %12.5f - will stop at %12.5f\n", max(abs(old.x - xx)), stopper))
 				utils::flush.console()
 			}
-			if (max(abs(old.x - xx)) < stopper) break 
+			if (max(abs(old.x - xx), na.rm=TRUE) < stopper) break 
 		}
 	y <- setValues(x, as.vector(xx))
 	mask(y, x)

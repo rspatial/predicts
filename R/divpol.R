@@ -1,5 +1,5 @@
 
-divider <- function(x, n, ...) {
+divider <- function(x, n, env=NULL, alpha=1, ...) {
 	stopifnot(geomtype(x) == "polygons")
 	n <- round(n)
 	stopifnot(n > 0)
@@ -7,9 +7,16 @@ divider <- function(x, n, ...) {
 	xcrs <- crs(x) 
 	crs(x) <- "+proj=utm +zone=1"
 	s <- terra::spatSample(x, max(n*4, 1000, log(n) * 100), "regular")
-	s <- terra::crds(s)
-	k <- stats::kmeans(s, centers = n, ...)
-	v <- terra::voronoi(vect(k$centers), bnd=x)
+	xy <- terra::crds(s)
+	if (!is.null(env)) {
+		alpha <- rep_len(alpha, 2)
+		e <- extract(env, s, ID=FALSE)
+		xy[,1] <- xy[,1] * alpha[1]
+		xy[,2] <- xy[,2] * alpha[2]
+		xy <- na.omit(cbind(xy, e))
+	} 
+	k <- stats::kmeans(xy, centers = n, ...)
+	v <- terra::voronoi(vect(k$centers[, 1:2]), bnd=x)
 	v <- terra::crop(v, x)
 	crs(v) <- xcrs
 	v
