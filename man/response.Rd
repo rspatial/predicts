@@ -31,3 +31,14 @@ partialResponse2(model, data, var, var2, var2levels, rng=NULL, nsteps=25)
 data.frame
 }
 
+\examples{
+fsp <- system.file("/ex/bradypus.csv", package="predicts")
+occ <- read.csv(fsp)[,-1]
+f <- system.file("ex/bio.tif", package="predicts")
+preds <- rast(f)[[c(1,7,9)]]
+v <- extract(preds, occ)
+
+bc <- envelope(v[,-1])
+
+partialResponse(bc, data = data.frame(bc@numeric), nsteps=30)
+}
