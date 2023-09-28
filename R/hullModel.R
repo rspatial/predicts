@@ -64,14 +64,14 @@ setMethod("lines", signature(x="HullModel"),
 	
 	stopifnot(nrow(xy) > 1)
 	if (!inherits(xy, "SpatVector")) {
-		m@presence <- as.matrix(xy)
+		m@presence <- data.frame(xy)
 		lonlat <- is.lonlat(as.character(crs))
-		xy <- vect(xy, geom=colnames(xy), crs=crs)
+		xy <- vect(m@presence, geom=colnames(xy), crs=crs)
 	} else {
 		if (geomtype(p) != "points") {
 			stop("SpatVector v must have points geometry")
 		}
-		m@presence <- crds(xy)
+		m@presence <- data.frame(crds(xy))
 		lonlat <- is.lonlat(xy)
 	}
 	xy <- na.omit(xy)

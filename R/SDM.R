@@ -2,13 +2,11 @@
 setClass("SDM",
 	contains = "VIRTUAL",
 	representation (
-		presence = "matrix",
-		absence = "matrix",
+		presence = "data.frame",
+		absence = "data.frame",
 		hasabsence = "logical"
 	),	
 	prototype (	
-		presence = matrix(nrow=0, ncol=2),
-		absence = matrix(nrow=0, ncol=2),
 		hasabsence = FALSE
 	),
 	validity = function(object)	{
@@ -20,15 +18,15 @@ setClass("SDM",
 
 setMethod ("show" , "SDM", 
 	function(object) {
-		cat("class    :" , class(object), "\n\n")
-		cat("variables:", colnames(object@presence), "\n\n")
+		cat("class    :" , class(object), "\n")
+		cat("variables:", colnames(object@presence), "\n")
 		pp <- nrow(object@presence)
-		cat("\npresence points:", pp, "\n")
+		cat("presence points:", pp, "\n")
 		if (pp < 10) {
 			print(object@presence)
 		} else {
-			print(object@presence[1:10,])
-			cat("  (... ...  ...)\n\n")
+			print(object@presence[1:6,])
+			cat("      ... \n")
 		}
 		if (object@hasabsence) {
 			pp <- nrow(object@absence)

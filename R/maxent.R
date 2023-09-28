@@ -4,9 +4,8 @@
 # Licence GPL v3
 
 setClass("MaxEnt_model",
+	contains = "SDM",
 	representation (
-		presence = "data.frame",
-		absence = "data.frame",
 		lambdas  = "vector",
 		results = "matrix",
 		path = "character",

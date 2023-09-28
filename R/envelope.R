@@ -11,8 +11,8 @@ if (!isGeneric("envelope")) {
 
 
 setClass("envelope_model",
+	contains = "SDM",
 	representation (
-		numeric = "list",
 		min = "numeric",
 		max = "numeric",
 		factor = "list",
@@ -60,15 +60,15 @@ setMethod("envelope", signature(x="data.frame"),
 			x <- x[sapply(x, length) > 1]
 			nv <- nv + length(x)
 			nms <- c(names(x), nms)
-			bc@numeric <- x
 			bc@min <- sapply(x, min)
 			bc@max <- sapply(x, max)
+			bc@presence <- data.frame(x)
 		}
 		if (nv == 0) {
 			stop("no variables with sufficient data")
 		}
 		if (nv < n) {
-			warning("variables with sufficient data were removed")
+			warning("variables with insufficient data were removed")
 		}
 		bc@names <- nms
 		bc
@@ -122,7 +122,7 @@ setMethod("show", signature(object="envelope_model"),
 	k[na] <- FALSE
 	nms <- colnames(xn)
 	for (i in 1:ncol(bc)) {
-		bc[k,i] <- .percRank(object@numeric[[ nms[i] ]], xn[k, nms[i], drop=FALSE], tails[i])
+		bc[k,i] <- .percRank(object@presence[[ nms[i] ]], xn[k, nms[i], drop=FALSE], tails[i])
 	}
 	return( apply(bc, 1, min) )
 }
@@ -199,7 +199,7 @@ setMethod("plot", signature(x="envelope_model", y='missing'),
 		p <- min(1,  max(0, p))
 		if (p > 0.5) p <- 1 - p
 		p <- p / 2
-		d <- as.data.frame(x@numeric)
+		d <- x@presence
 		prd <- predict(x, d)
 		i <- prd > p & prd < (1-p)
 		plot(d[,a], d[,b], xlab=colnames(d)[a], ylab=colnames(d)[b], cex=0)
