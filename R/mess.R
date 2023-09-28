@@ -1,12 +1,13 @@
 # author: Jean-Pierre Rossi <jean-pierre.rossi@supagro.inra.fr>
 # modifications by Robert Hijmans and Paulo van Breugel
+# rewritten for predicts by RH
 
-
-.messi3 <- function(p,v) {
+.messi <- function(p, v) {
 	
-	f <- 100*findInterval(p, sort(v)) / length(v)
-	minv <- min(v)
-	maxv <- max(v)
+	v <- sort(v)
+	f <- 100 * findInterval(p, v) / length(v)
+	minv <- v[1]
+	maxv <- v[length(v)]
 	res <- 2*f 
 	f[is.na(f)] <- -99
 	i <- f>50 & f<100
@@ -54,7 +55,7 @@ setMethod("mess", signature(x="SpatRaster"),
 			b <- writeStart(out, filename, ...)
 			for (i in 1:b$n) {		
 				vv <- terra::readValues(x, b$row[i], b$nrows[i])
-				p <- .messi3(vv, v)
+				p <- .messi(vv, v)
 				terra::writeValues(out, p, b$row[i], b$nrows[i])
 			}
 		} else {
@@ -64,16 +65,17 @@ setMethod("mess", signature(x="SpatRaster"),
 				b <- writeStart(out, filename, ...)
 				for (i in 1:b$n) {
 					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
-					vv <- sapply(1:ncol(v), function(i) .messi3(vv[,i], v[,i]))
+					vv <- sapply(1:ncol(v), function(i) .messi(vv[,i], v[,i]))
 					m <- apply(vv, 1, min, na.rm=TRUE)
 					terra::writeValues(out, cbind(vv, m), b$row[i], b$nrows[i])
 				}
 			} else {			
+				nlyr(out) <- 1
 				names(out) <- "mess"
 				b <- writeStart(out, filename, ...)
 				for (i in 1:b$n) {
 					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
-					vv <- sapply(1:ncol(v), function(i) .messi3(vv[,i], v[,i]))
+					vv <- sapply(1:ncol(v), function(i) .messi(vv[,i], v[,i]))
 					m <- apply(vv, 1, min, na.rm=TRUE)
 					terra::writeValues(out, m, b$row[i], b$nrows[i])
 				}
@@ -87,9 +89,9 @@ setMethod("mess", signature(x="SpatRaster"),
 setMethod("mess", signature(x="data.frame"), 
 	function(x, v, full=FALSE) {
 		if (ncol(x) == 1) {
-			data.frame(mess=.messi3(x, v))
+			data.frame(mess=.messi(x, v))
 		} else {
-			x <- sapply(1:ncol(x), function(i) .messi3(x[,i], v[,i]))
+			x <- sapply(1:ncol(x), function(i) .messi(x[,i], v[,i]))
 			rmess <- apply(x, 1, min, na.rm=TRUE)
 			if (full) {
 				out <- data.frame(x, rmess)
