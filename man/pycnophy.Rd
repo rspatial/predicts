@@ -11,7 +11,7 @@ Given a \code{SpatVector} of polygons and population data for each polygon, comp
 }
 
 \usage{
-pycnophy(x, v, pop, r = 0.2, converge = 3, verbose=TRUE)
+pycnophy(x, v, pop, r = 0.2, converge = 3, verbose=FALSE)
 }
 
 \arguments{
