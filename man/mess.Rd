@@ -61,7 +61,7 @@ bradypus <- bradypus[,2:3]
 
 predfile <- paste0(system.file(package="predicts"), "/ex/bio.tif")
 predictors <- rast(predfile)
-reference_points <- extract(predictors, bradypus)
+reference_points <- extract(predictors, bradypus, ID=FALSE)
 mss <- mess(x=predictors, v=reference_points, full=TRUE)
 plot(mss)
 }
