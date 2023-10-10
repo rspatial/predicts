@@ -35,7 +35,7 @@ Elith J., M. Kearney M., and S. Phillips, 2010. The art of modelling range-shift
 }
 
 \author{
-Jean-Pierre Rossi <jean-pierre.rossi@supagro.inra.fr>, Robert Hijmans, Paulo van Breugel
+Jean-Pierre Rossi, Robert Hijmans, Paulo van Breugel
 }
 
 
