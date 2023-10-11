@@ -47,8 +47,8 @@
 # and NA may break the code that receives it.
 #The function returns NA if(aszero=FALSE)   else a value of 0 is returned.
 	# abs to avoid very small (or zero) mean with e.g. -5:5
-	m <- mean(abs(x))  
-	if (m == 0) {
+	m <- mean(abs(x), na.rm=TRUE)  
+	if (!is.na(m) && (m == 0)) {
 		return(0)
 	} else {
 		return(100 * stats::sd(x) / m)
