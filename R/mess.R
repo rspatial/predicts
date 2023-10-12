@@ -66,7 +66,8 @@ setMethod("mess", signature(x="SpatRaster"),
 				for (i in 1:b$n) {
 					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
 					vv <- sapply(1:ncol(v), function(i) .messi(vv[,i], v[,i]))
-					m <- apply(vv, 1, min, na.rm=TRUE)
+					suppressWarnings(m <- apply(vv, 1, min, na.rm=TRUE))
+					m[!is.finite(m)] <- NA
 					terra::writeValues(out, cbind(vv, m), b$row[i], b$nrows[i])
 				}
 			} else {			
@@ -76,7 +77,8 @@ setMethod("mess", signature(x="SpatRaster"),
 				for (i in 1:b$n) {
 					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
 					vv <- sapply(1:ncol(v), function(i) .messi(vv[,i], v[,i]))
-					m <- apply(vv, 1, min, na.rm=TRUE)
+					suppressWarnings(m <- apply(vv, 1, min, na.rm=TRUE))
+					m[!is.finite(m)] <- NA
 					terra::writeValues(out, m, b$row[i], b$nrows[i])
 				}
 			}
