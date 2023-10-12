@@ -41,7 +41,8 @@ folds(srsp1, k = 5)
 k = folds(train, k=5, by=train$spid)
 
 ## each group has the same number of records 
-##(except for adjustments if the number of records divided by k is not an integer) 
+##(except for adjustments if the number of records 
+## divided by k is not an integer) 
 
 table(k[train$spid=="nsw01"])
 }
