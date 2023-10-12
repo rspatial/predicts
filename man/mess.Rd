@@ -63,7 +63,10 @@ predfile <- paste0(system.file(package="predicts"), "/ex/bio.tif")
 predictors <- rast(predfile)
 reference_points <- extract(predictors, bradypus, ID=FALSE)
 mss <- mess(x=predictors, v=reference_points, full=TRUE)
-plot(mss)
+
+breaks <- c(-500, -50, -25, -5, 0, 5, 25, 50, 100)
+fcol <- colorRampPalette(c("blue", "beige", "red"))
+plot(mss[[10]], breaks=breaks, col=fcol(9), plg=list(x="bottomleft"))
 }
 
 }
