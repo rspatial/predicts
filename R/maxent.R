@@ -157,11 +157,11 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 
 		x <- rbind(pv, av)
 		
-		#if (!is.null(factors)) {
-		#	for (f in factors) {
-		#		x[,f] <- factor(x[,f])
-		#	}
-		#}
+		if (!is.null(factors)) {
+		  for (f in factors) {
+		    x[,f] <- factor(x[,f])
+		  }
+		}
 		
 		p <- c(rep(1, nrow(pv)), rep(0, nrow(av)))
 		MaxEnt(x, p, ...)	
@@ -196,12 +196,12 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		p <- x[,1]
 		x <- x[, -1 ,drop=FALSE]
 
-		#factors <- NULL
-		#for (i in 1:ncol(x)) {
-		#	if (class(x[,i]) == "factor") {
-		#		factors <- c(factors, colnames(x)[i])
-		#	}
-		#}
+		factors <- NULL
+		for (i in 1:ncol(x)) {
+		  if (class(x[,i]) == "factor") {
+		    factors <- c(factors, colnames(x)[i])
+		  }
+		}
 		
 		if (!missing(path)) {
 			path <- trimws(path)
@@ -241,7 +241,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		replicates <- .getreps(args) 
 		args <- c("-z", args)
 
-		factors = NULL
+		# factors = NULL
 		if (is.null(factors)) {
 			str <- rJava::.jcall(mxe, "S", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, args)) 
 		} else {
