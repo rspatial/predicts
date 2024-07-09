@@ -98,10 +98,11 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 } 
 
 
+#factors=NULL, 
 setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"), 
-	function(x, p, a=NULL, factors=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
+	function(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
 
-		p <- .getMatrix(p)
+		p <- predicts:::.getMatrix(p)
 		if (removeDuplicates) {
 			cells <- unique(cellFromXY(x, p))
 			pv <- extract(x, cells)
@@ -155,16 +156,16 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 		
 		# Signature = data.frame, missing
 
-		x <- rbind(pv, av)
+		v <- rbind(pv, av)
 		
-		if (!is.null(factors)) {
-		  for (f in factors) {
-		    x[,f] <- factor(x[,f])
-		  }
-		}
+#		if (!is.null(factors)) {
+#		  for (f in factors) {
+#		    x[,f] <- factor(x[,f])
+#		  }
+#		}
 		
 		p <- c(rep(1, nrow(pv)), rep(0, nrow(av)))
-		MaxEnt(x, p, ...)	
+		MaxEnt(v, p, ...)	
 	}
 )
 
@@ -196,11 +197,9 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		p <- x[,1]
 		x <- x[, -1 ,drop=FALSE]
 
-		factors <- NULL
-		for (i in 1:ncol(x)) {
-		  if (class(x[,i]) == "factor") {
-		    factors <- c(factors, colnames(x)[i])
-		  }
+		factors <- names(x)[sapply(x, is.factor)]
+		for (f in factors) {
+			x[,f] <- as.integer(x[, f])
 		}
 		
 		if (!missing(path)) {
@@ -238,7 +237,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		mxe <- rJava::.jnew("mebridge")
 		
 		names(args) = NULL
-		replicates <- .getreps(args) 
+		replicates <- predicts:::.getreps(args) 
 		args <- c("-z", args)
 
 		# factors = NULL
@@ -382,21 +381,21 @@ setMethod("predict", signature(object="MaxEnt_model_replicates"),
 	if (inherits(x, "data.frame")) {
 		for (i in 1:ncol(x)) {
 			if (inherits(x[,i], "factor")) {
-				x[,i] <- as.numeric(as.character(x[,i]))
+				x[,i] <- as.numeric(x[,i])
 			} else if (inherits(x[,i], "character")) {
 				x[,i] <- as.numeric(x[,i])
 			}
 		}
-	} else {
-		x[] <- as.numeric(x)
-	}
+	} #else {
+		#x[] <- as.numeric(x)
+	#}
 	
 	out <- rep(NA, times=nrow(x))
 	ok <- rowSums(is.na(x)) == 0
 	if (sum(ok) > 0) {
 		x <- as.matrix(x[ok, ,drop=FALSE])
-		p <- rJava::.jcall(mxe, "[D", "predict", lambdas, rJava::.jarray(colnames(x)), rJava::.jarray(x, dispatch=TRUE), args) 
-		p[p == -9999] <- NA
+		p <- rJava::.jcall(mxe, "[D", "predict", lambdas, rJava::.jarray(colnames(x)), rJava::.jarray(x, dispatch=TRUE), args)
+		p[p < -9999] <- NA
 		out[ok] <- p
 	}
 	out
@@ -446,7 +445,7 @@ setMethod("predict", signature(object="MaxEnt_model"),
 		on.exit(terra::readStop(x))
 		b <- terra::writeStart(out, filename, ...)
 		for (i in 1:b$n) {
-			rowvals <- terra::readValues(x, b$row[i], b$nrows[i], 1, ncol(x), TRUE, FALSE)
+			rowvals <- terra::readValues(x, b$row[i], b$nrows[i], 1, ncol(x), FALSE, TRUE)
 			p <- .maxent_predict(object, mxe, args, rowvals)
 			terra::writeValues(out, p, b$row[i], b$nrows[i])
 		}
