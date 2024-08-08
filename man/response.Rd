@@ -13,10 +13,10 @@ Get partial response data.
 
 
 \usage{
-partialResponse(model, data, var=1, rng=NULL, nsteps=25)
-partialResponse2(model, data, var, var2, var2levels, rng=NULL, nsteps=25)
+partialResponse(model, data, var=1, rng=NULL, nsteps=25, ...)
+partialResponse2(model, data, var, var2, var2levels, rng=NULL, nsteps=25, ...)
 }
- 
+
 \arguments{
   \item{model}{a model object}
   \item{data}{data.frame with data for all model variables}
@@ -25,6 +25,7 @@ partialResponse2(model, data, var, var2, var2levels, rng=NULL, nsteps=25)
   \item{var2levels}{character. The levels of the second variable to consider}
   \item{rng}{optional vector of two numbers to set the range or the variable}
   \item{nsteps}{positive integer. Number of steps to consider for the variable}
+  \item{\dots}{additional arguments to pass to \code{\link{predict}}, e.g. \code{n.trees} for GBM}
 }
 
 \value{
