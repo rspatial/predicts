@@ -13,7 +13,7 @@
 }
 
 
-varImportance <- function(model, data, vars=colnames(data), n=10) {
+varImportance <- function(model, data, vars=colnames(data), n=10, ...) {
 	RMSE <- matrix(nrow=n, ncol=length(vars))
 	colnames(RMSE) <- vars
 
@@ -24,7 +24,7 @@ varImportance <- function(model, data, vars=colnames(data), n=10) {
 		}
 	}
 
-	P <- predict(model, data)
+	P <- predict(model, data, ...)
 	for (i in 1:length(vars)) {
 		rd <- data
 		v <- vars[i]
@@ -38,7 +38,7 @@ varImportance <- function(model, data, vars=colnames(data), n=10) {
 }
 
 
-partialResponse <- function(model, data, var=1, rng=NULL, nsteps=25) {
+partialResponse <- function(model, data, var=1, rng=NULL, nsteps=25, ...) {
 
 	if (missing(data)) {
 		data <- .get_model_data(model)
@@ -66,7 +66,7 @@ partialResponse <- function(model, data, var=1, rng=NULL, nsteps=25) {
 	res <- rep(NA, length(steps))
 	for (i in 1:length(steps)) {
 		data[[var]] <- steps[i]
-		p <- predict(model, data)
+		p <- predict(model, data, ...)
 		res[i] <- mean(p)
 	}
 	x <- data.frame(steps, res)
@@ -75,7 +75,7 @@ partialResponse <- function(model, data, var=1, rng=NULL, nsteps=25) {
 }
 
 
-partialResponse2 <- function(model, data, var, var2, var2levels, rng=NULL, nsteps=25) {
+partialResponse2 <- function(model, data, var, var2, var2levels, rng=NULL, nsteps=25, ...) {
 	if (is.factor(data[[var]])) {
 		steps <- levels(data[[var]])
 	} else {
@@ -91,7 +91,7 @@ partialResponse2 <- function(model, data, var, var2, var2levels, rng=NULL, nstep
 		data[[var2]] <- v
 		for (i in 1:length(steps)) {
 			data[[var]] <- steps[i]
-			p <- stats::predict(model, data)
+			p <- stats::predict(model, data, ...)
 			res[i] <- mean(p)
 		}
 		out[[paste(var2, v, sep="_")]] <- res

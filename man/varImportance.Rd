@@ -12,7 +12,7 @@ Get variable importance.
 
 
 \usage{
-varImportance(model, data, vars=colnames(data), n=10)
+varImportance(model, data, vars=colnames(data), n=10, ...)
 }
  
 \arguments{
@@ -20,6 +20,7 @@ varImportance(model, data, vars=colnames(data), n=10)
   \item{data}{data.frame with data for all model variables}
   \item{vars}{character. The variables of interest}
   \item{n}{positive integer. Number of simulations}
+  \item{...}{model specific additional arguments passed to \code{predict}}
 }
 
 \value{
