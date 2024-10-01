@@ -182,7 +182,7 @@ function(object, x, tails=NULL, extent=NULL, filename="", ...) {
 
 
 setMethod("plot", signature(x="envelope_model", y='missing'), 
-	function(x, a=1, b=2, p=0.9, ...) {
+	function(x, a=1, b=2, p=0.9, ocol="gray", icol="red", bcol="blue", cex=0.6, ...) {
 			
 		myquantile <- function(x, p) {
 			p <- min(1, max(0, p))
@@ -204,8 +204,8 @@ setMethod("plot", signature(x="envelope_model", y='missing'),
 		i <- prd > p & prd < (1-p)
 		if (is.character(a)) xlab <- a else xlab <- colnames(d)[a]
 		if (is.character(b)) ylab <- b else ylab <- colnames(d)[b]
-		plot(d[,a], d[,b], xlab=xlab, ylab=ylab, cex=0)
-		type=6
+		plot(d[,a], d[,b], xlab=xlab, ylab=ylab, cex=0, type="n")
+		type <- 6
 		x1 <- quantile(d[,a], probs=p, type=type)	
 		x2 <- quantile(d[,a], probs=1-p, type=type)	
 		y1 <- quantile(d[,b], probs=p, type=type)	
@@ -213,10 +213,11 @@ setMethod("plot", signature(x="envelope_model", y='missing'),
 #		x1 <- myquantile(x[,a], p)	
 #		x2 <- myquantile(x[,a], 1-p)	
 #		y1 <- myquantile(x[,b], p)	
-#		y2 <- myquantile(x[,b], 1-p)	
-		graphics::polygon(rbind(c(x1,y1), c(x1,y2), c(x2,y2), c(x2,y1), c(x1,y1)), border='blue', lwd=2)
-		points(d[i,a], d[i,b], xlab=colnames(x)[a], ylab=colnames(x)[b], col='green' )
-		points(d[!i,a], d[!i,b], col='red', pch=3)
+#		y2 <- myquantile(x[,b], 1-p)
+		cex <- rep_len(cex, 2)
+		points(d[!i,a], d[!i,b], col=ocol, pch=3, cex=cex[1])
+		points(d[i,a], d[i,b], xlab=colnames(x)[a], ylab=colnames(x)[b], col=icol, cex=cex[2])
+		graphics::polygon(rbind(c(x1,y1), c(x1,y2), c(x2,y2), c(x2,y1), c(x1,y1)), border=bcol, lwd=2)
 	}
 )
 

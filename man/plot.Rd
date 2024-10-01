@@ -14,7 +14,7 @@ Plot predictor values for occurrence (presence and absence) data in a model obje
 }
 
 \usage{
-\S4method{plot}{envelope_model,missing}(x, a = 1, b = 2, p = 0.9, ...)
+\S4method{plot}{envelope_model,missing}(x, a = 1, b = 2, p = 0.9, ocol="gray", icol="red", bcol="blue", cex=c(0.6, 0.6), ...)
 
 \S4method{plot}{MaxEnt_model,ANY}(x, y, ...)
 }
@@ -24,8 +24,11 @@ Plot predictor values for occurrence (presence and absence) data in a model obje
 \item{a}{name or position of the variable to plot in the x axis}
 \item{b}{name or position of the variable to plot in the y axis}
 \item{p}{percentile for coloring the points in the plot and delimiting the envelope rectangle}
-\item{y}{missing}
-\item{...}{arguments passed to \link[base]{plot}}
+\item{ocol}{color of the points outside the envelope} 
+\item{icol}{color of the points inside the envelope}
+\item{bcol}{color of the envelope border}
+\item{cex}{size of the points outside and inside the envelope}
+\item{...}{additional arguments. Not used}
 }
 
 
