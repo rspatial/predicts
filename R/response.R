@@ -65,7 +65,9 @@ partialResponse <- function(model, data, var=1, rng=NULL, nsteps=25, ...) {
 	}
 	res <- rep(NA, length(steps))
 	for (i in 1:length(steps)) {
-		data[[var]] <- steps[i]
+		# to handle factors (#16)
+		data[data[[var]] != steps[i], var] <- steps[i]
+
 		p <- predict(model, data, ...)
 		res[i] <- mean(p)
 	}
@@ -90,7 +92,9 @@ partialResponse2 <- function(model, data, var, var2, var2levels, rng=NULL, nstep
 	for (v in var2levels) {
 		data[[var2]] <- v
 		for (i in 1:length(steps)) {
-			data[[var]] <- steps[i]
+			# to handle factors (#16)
+			data[data[[var]] != steps[i], var] <- steps[i]
+			##data[[var]] <- steps[i]
 			p <- stats::predict(model, data, ...)
 			res[i] <- mean(p)
 		}
