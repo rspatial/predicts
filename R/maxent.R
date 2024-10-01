@@ -72,7 +72,7 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 			v = getOption("dismo_maxent")
 		}
 		if (!silent) {
-			message(paste("This is MaxEnt_model version", v))
+			message(paste("This is MaxEnt version", v))
 		}
 		invisible(TRUE)
 	}
