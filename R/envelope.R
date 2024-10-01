@@ -129,7 +129,7 @@ setMethod("show", signature(object="envelope_model"),
 
 
 setMethod("predict", signature(object="envelope_model"), 
-function(object, x, tails=NULL, extent=NULL, filename="", ...) {
+function(object, x, tails=NULL, ext=NULL, filename="", ...) {
 
 	ln <- object@names
 
@@ -160,7 +160,7 @@ function(object, x, tails=NULL, extent=NULL, filename="", ...) {
 		if ((length(ln) < length(x))) {
 			x <- x[[ln]]
 		}
-		if (!is.null(extent)) {
+		if (!is.null(ext)) {
 			x <- terra::crop(x, ext)
 		}
 		out <- terra::rast(x, nlyr=1)
@@ -182,7 +182,7 @@ function(object, x, tails=NULL, extent=NULL, filename="", ...) {
 
 
 setMethod("plot", signature(x="envelope_model", y='missing'), 
-	function(x, a=1, b=2, p=0.9, ocol="gray", icol="red", bcol="blue", cex=0.6, ...) {
+	function(x, a=1, b=2, p=0.9, ocol="gray", icol="red", bcol="blue", cex=c(0.6, 0.6), ...) {
 			
 		myquantile <- function(x, p) {
 			p <- min(1, max(0, p))

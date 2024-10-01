@@ -28,6 +28,7 @@ Plot predictor values for occurrence (presence and absence) data in a model obje
 \item{icol}{color of the points inside the envelope}
 \item{bcol}{color of the envelope border}
 \item{cex}{size of the points outside and inside the envelope}
+\item{y}{not used}
 \item{...}{additional arguments. Not used}
 }
 

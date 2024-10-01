@@ -1,5 +1,5 @@
 
-setClass("HullModel",
+setClass("hull_model",
 	contains = "SDM",
 	representation (
 		type = "character",
@@ -15,19 +15,19 @@ setClass("HullModel",
 )
 
 
-setMethod("geometry", "HullModel",
+setMethod("geometry", "hull_model",
 	function(x) {
 		x@polygons
 	}
 )
 
-setMethod("plot", signature(x="HullModel", y="missing"), 
+setMethod("plot", signature(x="hull_model", y="missing"), 
 	function(x, ...) {
 		terra::plot(x@polygons, ...)
 	}
 )
 
-setMethod("lines", signature(x="HullModel"), 
+setMethod("lines", signature(x="hull_model"), 
 	function(x, ...) {
 		terra::lines(x@polygons, ...)
 	}
@@ -60,7 +60,7 @@ setMethod("lines", signature(x="HullModel"),
 	type <- match.arg(type, c("circle", "rectangle", "convex"))
 	n <- round(n)
 	
-	m <- new("HullModel")
+	m <- new("hull_model")
 	
 	stopifnot(nrow(xy) > 1)
 	if (!inherits(xy, "SpatVector")) {
@@ -161,7 +161,7 @@ setMethod("hullModel", signature(p="SpatVector"),
 
 
 
-setMethod("predict", signature(object="HullModel"), 
+setMethod("predict", signature(object="hull_model"), 
 	function(object, x, ext=NULL, mask=FALSE, filename="",  ...) {
 	
 		nc <- nrow(object@polygons)

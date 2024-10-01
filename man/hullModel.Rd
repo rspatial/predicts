@@ -1,6 +1,6 @@
-\name{hullModel}
+\name{hull_model}
 
-\alias{HullModel-class}
+\alias{hull_model-class}
 
 \alias{hullModel}
 \alias{hullModel,SpatVector-method}
@@ -8,9 +8,9 @@
 \alias{hullModel,data.frame-method}
 
 \alias{geometry}
-\alias{geometry,HullModel-method}
+\alias{geometry,hull_model-method}
 
-\alias{plot,HullModel,missing-method}
+\alias{plot,hull_model,missing-method}
 
 
 \title{hull model}
@@ -40,7 +40,7 @@ The hull can be "convex", "circle", or "rectangle"
 
 
 \value{
-"HullModel"
+hull_model
 }
 
 
