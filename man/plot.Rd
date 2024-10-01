@@ -21,9 +21,9 @@ Plot predictor values for occurrence (presence and absence) data in a model obje
 
 \arguments{
 \item{x}{model object}
-\item{a}{describe}
-\item{b}{describe}
-\item{p}{describe}
+\item{a}{name or position of the variable to plot in the x axis}
+\item{b}{name or position of the variable to plot in the y axis}
+\item{p}{percentile for coloring the points in the plot and delimiting the envelope rectangle}
 \item{y}{missing}
 \item{...}{arguments passed to \link[base]{plot}}
 }
