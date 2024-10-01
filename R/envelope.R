@@ -202,7 +202,9 @@ setMethod("plot", signature(x="envelope_model", y='missing'),
 		d <- x@presence
 		prd <- predict(x, d)
 		i <- prd > p & prd < (1-p)
-		plot(d[,a], d[,b], xlab=colnames(d)[a], ylab=colnames(d)[b], cex=0)
+		if (is.character(a)) xlab <- a else xlab <- colnames(d)[a]
+		if (is.character(b)) ylab <- b else ylab <- colnames(d)[b]
+		plot(d[,a], d[,b], xlab=xlab, ylab=ylab, cex=0)
 		type=6
 		x1 <- quantile(d[,a], probs=p, type=type)	
 		x2 <- quantile(d[,a], probs=1-p, type=type)	
