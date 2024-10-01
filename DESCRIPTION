@@ -2,14 +2,16 @@ Package: predicts
 Type: Package
 Title: Spatial Prediction Tools
 Description: Methods for spatial predictive modeling, especially for spatial distribution models. This includes algorithms for model fitting and prediction, as well as methods for model evaluation. 
-Version: 0.1-13
-Date: 2023-10-13
+Version: 0.1-14
+Date: 2024-10-01
 Depends: R (>= 3.5.0), methods, terra
+Encoding: UTF-8
 Suggests: disdat, rJava
 Authors@R: c(
 	person("Robert J.", "Hijmans", role = c("cre", "aut"),  
 			email = "r.hijmans@gmail.com", comment = c(ORCID = "0000-0001-5872-2872")),
 	person("Steven", "Phillips", role = "ctb"),
+	person("Márcia", "Barbosa", role = "ctb"),	
 	person("Chris", "Brunsdon", role = "ctb"),
 	person("Barry", "Rowlingson", role = "ctb"))
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 

@@ -28,7 +28,7 @@ envelope(x, ...)
  
 
 \arguments{
-  \item{x}{matrix or data.frame where each column is an environmental variable and each row an occurrence. Alternatively, a SpatRaster where each layer is an environmental variable, in which case you must also provide argument 'p': a SpatVector of the occurrence points, or a data.frame of their spatial coordinates. Only pixels that overlap occurrences will be used.}
+  \item{x}{matrix or data.frame where each column is an environmental variable and each row an occurrence. Alternatively, a SpatRaster where each layer is an environmental variable, in which case you must also provide argument 'p': a SpatVector of the occurrence points, or a data.frame of their spatial coordinates. Only grid cells that overlap with occurrences are used.}
   \item{...}{ Additional arguments }
 }
 
