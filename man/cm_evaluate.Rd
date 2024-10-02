@@ -1,15 +1,15 @@
-\name{evaluate}
+\name{cm_evaluate}
 
-\alias{evaluate}
+\alias{cm_evaluate}
 
-\title{Model evaluation }
+\title{Model evaluation with a confusion matrix}
 
 \description{
-Get model evaluation statistics from a confusion matrix.
+Get model evaluation statistics from a confusion matrix. This is useful when predicting (multiple) classes.
 }
 
 \usage{
-evaluate(cmat, stat)
+cm_evaluate(cmat, stat="overall")
 }
 
 \arguments{
@@ -33,7 +33,7 @@ predicted[i] <- sample(classes, length(i), replace=TRUE)
 conmat <- table(observed, predicted)
 conmat
 
-evaluate(conmat, "kappa")
-evaluate(conmat, "class")
+cm_evaluate(conmat, "kappa")
+cm_evaluate(conmat, "class")
 }
 
