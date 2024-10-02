@@ -13,13 +13,13 @@
 }
 
 
-varImportance <- function(model, y, x, vars=colnames(x), n=10, stat, ...) {
+varImportance <- function(model, y, x, n=10, stat, ...) {
 
-	vars <- vars[vars %in% colnames(x)]
-	if (length(vars) < 1) {
-		stop("no valid names in vars")
-	}
-
+#	vars <- vars[vars %in% colnames(x)]
+#	if (length(vars) < 1) {
+#		stop("no valid names in vars")
+#	}
+	vars <- colnames(x)
 	eva <- matrix(nrow=n, ncol=length(vars))
 	colnames(eva) <- vars
 
@@ -63,7 +63,7 @@ varImportance <- function(model, y, x, vars=colnames(x), n=10, stat, ...) {
 		v <- vars[i]
 		for (j in 1:n) {
 			rd[[v]] <- sample(rd[[v]])
-			p <- predict(model, rd)
+			p <- predict(model, rd, ...)
 			eva[j,i] <- efun(y, p)
 		}
 	}
