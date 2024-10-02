@@ -87,6 +87,10 @@ Fielding, A.H. and J.F. Bell, 1997. A review of methods for the assessment of pr
 Liu, C., M. White & G. Newell, 2011. Measuring and comparing the accuracy of species distribution models with presence-absence data. Ecography 34: 232-243.
 }
 
+
+\seealso{\code{\link{cm_evaluate}}}
+
+
 \examples{
 set.seed(0)
 # p has the predicted values for 50 known cases (locations) 

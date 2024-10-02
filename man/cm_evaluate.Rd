@@ -17,6 +17,7 @@ cm_evaluate(cmat, stat="overall")
   \item{stat}{character. Either "overall" (overall accuracy), "kappa", "class" for user and producer accuracy}
 }
 
+\seealso{\code{\link{pa_evaluate}}}
 
 \value{
 numeric
