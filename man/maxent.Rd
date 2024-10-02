@@ -148,7 +148,6 @@ plot(e3, 'ROC')
 }
 }
 
-}
 
 \keyword{spatial}
 
