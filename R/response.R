@@ -13,28 +13,61 @@
 }
 
 
-varImportance <- function(model, data, vars=colnames(data), n=10, ...) {
-	RMSE <- matrix(nrow=n, ncol=length(vars))
-	colnames(RMSE) <- vars
+varImportance <- function(model, y, x, vars=colnames(x), n=10, stat, ...) {
 
-	if (missing(data)) {
-		data <- .get_model_data(model)
+	vars <- vars[vars %in% colnames(x)]
+	if (length(vars) < 1) {
+		stop("no valid names in vars")
+	}
+
+	eva <- matrix(nrow=n, ncol=length(vars))
+	colnames(eva) <- vars
+
+	if (missing(x)) {
+		x <- .get_model_data(model)
 		if (is.null(data)) {
 			stop("data argument cannot be missing when using this model type")
 		}
 	}
 
-	P <- predict(model, data, ...)
+	P <- predict(model, x, ...)
+	if (is.factor(P)) {
+		if (missing(stat)) stat = "overall"
+		stopifnot(stat %in% c("overall", "kappa"))
+		efun <- function(y, x) {
+			tab <- table(x, y)
+			1 - cm_evaluate(tab, stat)
+		}
+	} else {
+		if (missing(stat)) stat = "RMSE"
+		stopifnot(stat %in% c("RMSE", "AUC", "cor"))
+		if (stat == "AUC") {
+			efun <- function(y, x) {
+				i <- y == 1
+				1 - pa_evaluate(x[i], x[!i])@stats$auc
+			}
+		} else if (stat == "cor"){
+			efun <- function(y, x) {
+				i <- y == 1
+				1 - pa_evaluate(x[i], x[!i])@stats$cor
+			}
+		} else {
+			efun <- predicts::RMSE
+		}
+	}
+
+	base <- efun(y, P)
+
 	for (i in 1:length(vars)) {
-		rd <- data
+		rd <- x
 		v <- vars[i]
 		for (j in 1:n) {
 			rd[[v]] <- sample(rd[[v]])
 			p <- predict(model, rd)
-			RMSE[j,i] <- predicts::RMSE(P, p)
+			eva[j,i] <- efun(y, p)
 		}
 	}
-	colMeans(RMSE) 
+	colMeans(eva) - base 
 }
 
 
