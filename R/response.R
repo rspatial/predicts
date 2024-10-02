@@ -90,7 +90,7 @@ varImportance <- function(model, y, x, n=10, stat, ...) {
 partialResponse <- function(model, data, var=NULL, rng=NULL, nsteps=25, plot=TRUE, nr, nc, ...) {
 
 	if (missing(data)) {
-		data <- predicts:::.get_model_data(model)
+		data <- .get_model_data(model)
 		if (is.null(data)) {
 			stop("data argument cannot be missing when using this model type")
 		}
