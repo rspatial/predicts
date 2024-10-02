@@ -81,16 +81,13 @@ Jane Elith, Steven J. Phillips, Trevor Hastie, Miroslav Dudik, Yung En Chee, Col
 
 \examples{
 
-\donttest{
-
-# test if you can use MaxEnt 
+# test the MaxEnt version 
 MaxEnt()
 
-if (MaxEnt()) {
-
+\donttest{
 # get predictor variables
-f <- system.file("ex/bio.tif", package="predicts")
-preds <- rast(f)
+ff <- list.files("tif$", path=system.file("ex", package="predicts"), full.names=TRUE)
+preds <- rast(ff)
 plot(preds)
 
 # file with presence points
@@ -113,9 +110,6 @@ me2 <- MaxEnt(preds, occtrain, args=c("-J", "-P"))
 
 # plot showing importance of each variable
 plot(me)
-
-# response curves
-# response(me)
 
 # predict to entire dataset
 r <- predict(me, preds) 

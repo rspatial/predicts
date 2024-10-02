@@ -9,13 +9,15 @@ setClass("MaxEnt_model",
 		lambdas  = "vector",
 		results = "matrix",
 		path = "character",
-		html = "character"
+		html = "character",
+		levels = "list"		
 	),	
 	prototype (	
 		lambdas = as.vector(NA),
 		results = as.matrix(NA),
 		path = "",
-		html = ""
+		html = "",
+		levels = list()
 	),
 )
 
@@ -192,14 +194,26 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 
 		x <- cbind(p, x)
 		x <- stats::na.omit(x)
-		x[is.na(x)] <- -9999  # maxent flag for NA, unless changed with args(nodata= ), so we should check for that rather than use this fixed value.
+		nodata <- grep("nodata=", args, value=TRUE)
+		if (length(args) == 1) {
+			nodata = as.numeric(strsplit(nodata, "=")[[1]][2])
+			x[is.na(x)] <- nodata			
+		} else {
+			x[is.na(x)] <- -9999 
+		}
 
 		p <- x[,1]
 		x <- x[, -1 ,drop=FALSE]
 
+		me <- new("MaxEnt_model")
+
+		me@presence <- x[p==1, ,drop=FALSE]
+		me@absence <- x[p==0, ,drop=FALSE]
+
 		factors <- names(x)[sapply(x, is.factor)]
 		for (f in factors) {
-			x[,f] <- as.integer(x[, f])
+			me@levels[[f]] <- levels(x[[f]])
+			x[f] <- as.integer(x[[f]])
 		}
 		
 		if (!missing(path)) {
@@ -218,14 +232,13 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 				stop("cannot create output directory: ", f)
 			}
 		}
+		me@path <- dirout
 		
 		pv <- x[p==1, ,drop=FALSE]
 		av <- x[p==0, ,drop=FALSE]
-		me <- new("MaxEnt_model")
-		me@presence <- pv
-		me@absence <- av
-		me@path <- dirout
-
+		#me@presence <- pv
+		#me@absence <- av
+		
 		pv <- cbind(data.frame(species="species"), x=1:nrow(pv), y=1:nrow(pv), pv)
 		av <- cbind(data.frame(species="background"), x=1:nrow(av), y=1:nrow(av), av)
 		
@@ -377,16 +390,21 @@ setMethod("predict", signature(object="MaxEnt_model_replicates"),
 .maxent_predict <- function(object, mxe, args, x) {
 	lambdas <- paste(object@lambdas, collapse='\n')
 	variables <- colnames(object@presence)
-	x <- x[,variables,drop=FALSE]
+	x <- x[, variables, drop=FALSE]
 	if (inherits(x, "data.frame")) {
-		for (i in 1:ncol(x)) {
-			if (inherits(x[,i], "factor")) {
-				x[,i] <- as.numeric(x[,i])
-			} else if (inherits(x[,i], "character")) {
-				x[,i] <- as.numeric(x[,i])
-			}
+		for (nm in names(object@levels)) {
+			if (inherits(x[[nm]], "factor")) {
+				if ((length(levels(x[[nm]])) == length(object@levels[[nm]])) && (all(levels(x[[nm]]) == object@levels[[nm]]))) {
+					x[nm] <- as.integer(x[[nm]])
+				} else {
+					stop(paste0("levels of ", nm, " do not match the levels of the data used to fit model"))
+				}
+			} else {
+				stop(paste("expecting a factor or character value for", nm))
+			}	
 		}
-	} #else {
+	}
+	#else {
 		#x[] <- as.numeric(x)
 	#}
 	
