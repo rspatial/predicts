@@ -133,7 +133,7 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 				if (nas >= 0.5 * avr) {
 					stop("more than half of the background points have NA predictor values")
 				} else {
-					warning(nas, " (", round(100*nas/avr, 2), "%) of the presence points have NA predictor values")
+					warning(nas, " (", round(100*nas/avr, 2), "%) of the background points have NA predictor values")
 				}
 			}
 		} else { 
