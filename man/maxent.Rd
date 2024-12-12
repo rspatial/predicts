@@ -70,8 +70,6 @@ If the function is run without any arguments a boolean value is returned (\code{
 
 \references{
 
-\url{https://biodiversityinformatics.amnh.org/open_source/maxent/}
-
 Steven J. Phillips, Miroslav Dudik, Robert E. Schapire, 2004.  A maximum entropy approach to species distribution modeling. Proceedings of the Twenty-First International Conference on Machine Learning. p. 655-662.
 
 Steven J. Phillips, Robert P. Anderson, Robert E. Schapire, 2006. Maximum entropy modeling of species geographic distributions. Ecological Modelling 190:231-259. 

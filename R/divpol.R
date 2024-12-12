@@ -54,7 +54,7 @@ stripper <- function(x, f=c(1/3, 2/3), vertical=TRUE){
 			target_function <- function(xm){
 				expanse(crop(x, ext(ex$xmin, xm, ex$ymin, ex$ymax))) - target
 			}
-			stats::uniroot(target_function, lower=e$xmin, upper=e$xmax)$root
+			stats::uniroot(target_function, lower=e$xmin+0.0000001, upper=e$xmax)$root
 		})
 		bnds <- matrix(c(ex$xmin, rep(edges,rep(2,length(edges))), ex$xmax), ncol=2, byrow=TRUE)
 		a <- apply(bnds, 1, function(edges){ 
@@ -67,7 +67,7 @@ stripper <- function(x, f=c(1/3, 2/3), vertical=TRUE){
 			target_function <- function(ym){
 				expanse(crop(x, ext(ex$xmin, ex$xmax, ex$ymin, ym))) - target
 			}
-			stats::uniroot(target_function, lower=e$ymin, upper=e$ymax)$root
+			stats::uniroot(target_function, lower=e$ymin+0.0000001, upper=e$ymax)$root
 		})
 		bnds <- matrix(c(ex$ymin, rep(edges,rep(2,length(edges))), ex$ymax), ncol=2, byrow=TRUE)
 		a <- apply(bnds, 1, function(edges){ 

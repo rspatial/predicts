@@ -4,7 +4,9 @@
 
 .get_model_data <- function(m) {
 	if (inherits(m, "lm") || inherits(m, "glm")) {
-		m$model
+		rvar <- as.character(attributes(m$terms)$variables[[2]])
+		m <- m$model
+		m[, !(names(m) %in% rvar), drop=FALSE]
 	} else if (inherits(m, "SDM")) {
 		rbind(m@presence, m@absence)
 	} else {
@@ -12,21 +14,43 @@
 	}
 }
 
+.get_response_data <- function(m) {
+	if (inherits(m, "lm") || inherits(m, "glm")) {
+		rvar <- as.character(attributes(m$terms)$variables[[2]])
+		m$model[,rvar]
+	} else if (inherits(m, "SDM")) {
+		c(rep(1, nrow(m@presence)), rep(0, nrow(m@absence)))
+	} else {
+		NULL
+	}
+}
 
-varImportance <- function(model, y, x, n=10, stat, ...) {
+
+varImportance <- function(model, y, x, n=10, stat, value="relative", ...) {
 
 #	vars <- vars[vars %in% colnames(x)]
 #	if (length(vars) < 1) {
 #		stop("no valid names in vars")
 #	}
-	vars <- colnames(x)
-	eva <- matrix(nrow=n, ncol=length(vars))
-	colnames(eva) <- vars
-
+	
+	value <- match.arg(tolower(value), c("absolute", "relative", "difference"))
+	
 	if (missing(x)) {
 		x <- .get_model_data(model)
 		if (is.null(x)) {
 			stop("data argument cannot be missing when using this model type")
+		}
+	}
+	vars <- colnames(x)
+	eva <- matrix(nrow=n, ncol=length(vars))
+	colnames(eva) <- vars
+
+	
+	if (missing(y)) {
+		y <- .get_response_data(model)
+		if (is.null(y)) {
+			message("computing response (y) from x")
+			y <- predict(model, x, ...)
 		}
 	}
 
@@ -67,7 +91,13 @@ varImportance <- function(model, y, x, n=10, stat, ...) {
 			eva[j,i] <- efun(y, p)
 		}
 	}
-	colMeans(eva) - base 
+	if (value == "relative") {
+		(colMeans(eva) - base) / base
+	} else if (value == "absolute") {
+		colMeans(eva)
+	} else { #"difference"
+		colMeans(eva) - base
+	}
 }
 
 
