@@ -93,7 +93,7 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 		stop("data should be  a matrix, data.frame, or SpatVector")
 	}
 	if (dim(x)[2] != 2) {
-		stop("presence or absence coordinates data should be a matrix or data.frame with 2 columns" ) 	
+		stop("presence or background coordinates data should be a matrix or data.frame with 2 columns" ) 	
 	}
 	colnames(x) <- c("x", "y")
 	return(x)
@@ -131,13 +131,13 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 			nas <- length(as.vector(attr(av, "na.action")))
 			if (nas > 0) {
 				if (nas >= 0.5 * avr) {
-					stop("more than half of the absence points have NA predictor values")
+					stop("more than half of the background points have NA predictor values")
 				} else {
 					warning(nas, " (", round(100*nas/avr, 2), "%) of the presence points have NA predictor values")
 				}
 			}
 		} else { 
-		# random absence
+		# random background
 			if (is.null(nbg)) {
 				nbg <- 10000 
 			} else {
@@ -243,7 +243,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		av <- cbind(data.frame(species="background"), x=1:nrow(av), y=1:nrow(av), av)
 		
 		pfn <- paste(dirout, "/presence", sep="")
-		afn <- paste(dirout, "/absence", sep="")
+		afn <- paste(dirout, "/background", sep="")
 		utils::write.table(pv, file=pfn, sep=",", row.names=FALSE)
 		utils::write.table(av, file=afn, sep=",", row.names=FALSE)
 
