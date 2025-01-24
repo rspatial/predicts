@@ -49,7 +49,7 @@ setMethod("lines", signature(x="hull_model"),
 	xy <- data.frame(xy)
 	for (i in clusters) {
 		pts <- vect(xy[cl==i, ], geom=colnames(xy))
-		h[[i]] <- convHull(pts)
+		h[[i]] <- terra::hull(pts, "convex")
 	}
 	vect(h)
 }
@@ -90,7 +90,7 @@ setMethod("lines", signature(x="hull_model"),
 		if (n > 1) {
 			xy <- .k_convexHulls(xy, n)
 		} else {
-			xy <- convHull(xy)
+			xy <- terra::hull(xy, "convex")
 		}
 		if (lonlat) {
 			xy <- densify(xy, 10000)
@@ -101,7 +101,7 @@ setMethod("lines", signature(x="hull_model"),
 			xy <- .k_convexHulls(xy, n)
 			h <- vector(mode="list", length=n)
 			for (i in 1:n) {
-				h[[i]] <- minRect(xy[i,])
+				h[[i]] <- terra::hull(xy[i,], "rectangle")
 			}
 			xy <- vect(h)
 		} else {
@@ -126,7 +126,7 @@ setMethod("lines", signature(x="hull_model"),
 			}
 			b <- vect(h)
 		} else {
-			xy <- convHull(xy)
+			xy <- terra::hull(xy, "convex")
 			xy <- crds(xy)
 			f <- function(p) { max(distance(rbind(p), xy, lonlat=lonlat)) }
 			p <- stats::optim(colMeans(xy), f)
