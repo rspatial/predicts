@@ -105,7 +105,7 @@ setMethod("lines", signature(x="hull_model"),
 			}
 			xy <- vect(h)
 		} else {
-			xy <- minRect(xy)
+			xy <- hull(xy, "rectangle")
 		}
 		if (lonlat) {
 			xy <- densify(xy, 10000)
