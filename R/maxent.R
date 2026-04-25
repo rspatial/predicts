@@ -195,7 +195,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		x <- cbind(p, x)
 		x <- stats::na.omit(x)
 		nodata <- grep("nodata=", args, value=TRUE)
-		if (length(args) == 1) {
+		if (length(nodata) == 1) {
 			nodata = as.numeric(strsplit(nodata, "=")[[1]][2])
 			x[is.na(x)] <- nodata			
 		} else {
