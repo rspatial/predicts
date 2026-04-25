@@ -13,7 +13,7 @@ This file outlines the steps you should take to begin using maxent to
 model species geographic distributions.  To download the program, or
 for background on maxent and its application to species distribution
 modeling, please see 
-https://biodiversityinformatics.amnh.org/open_source/maxent.
+http://biodiversityinformatics.amnh.org/open_source/maxent.
 
 
 Terms and Conditions
@@ -118,6 +118,10 @@ click on the maxent.bat file instead.  If this is not the problem,
 click on the "help" button for more advice.
 
 
+Main Changes in Version 3.4.4:
+-----------------------------
+   Minor bug fix.
+   
 Main Changes in Version 3.4.3:
 -----------------------------
    Fixed a bug that was causing abrupt changes in response curves for some floating -point predictor variables,
