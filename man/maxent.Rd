@@ -13,18 +13,18 @@
 \alias{MaxEnt_model-class}
 \alias{MaxEnt_model_replicates-class}
 
-\title{MaxEnt}
+\title{MaxEnt species distribution model}
 
 \description{
-Build a "maxent" (Maximum Entropy) species distribution model (see references below). The function uses environmental data for locations of known presence and for a large number of 'background' locations. Environmental data can be extracted from raster files. The result is a model object that can be used to predict the suitability of other locations, for example, to predict the entire range of a species. 
+Build a "maxent" (Maximum Entropy) species distribution model. The function uses environmental data for locations of known presence and for a large number of 'background' locations. Environmental data can be extracted from raster files. The result is a model object that can be used to predict the suitability of other locations, for example, to predict the entire range that is suitable for a species. 
 
 Background points are sampled randomly from the cells that are not \code{NA} in the first predictor variable, unless background points are specified with argument \code{a}. 
 
-This function uses the MaxEnt species distribution model software by Phillips, Dudik and Schapire.
+This function uses the MaxEnt species distribution model software by Phillips, Dudik and Schapire available \href{here}{https://biodiversityinformatics.amnh.org/open_source/maxent/}.
 }
 
 \usage{
-\S4method{MaxEnt}{SpatRaster,SpatVector}(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, ...)
+\S4method{MaxEnt}{SpatRaster,SpatVector}(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, biasfile=NULL, ...)
 
 \S4method{MaxEnt}{data.frame,numeric}(x, p, args=NULL, path, silent=FALSE, ...)
 
@@ -42,8 +42,9 @@ If \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 
 \item{nbg}{Number of background points to use. These are sampled randomly from the cells that are not \code{NA} in the first predictor variable. Ignored if background points are specified with argument \code{a}} 
 
+\item{biasfile}{Optional \code{SpatRaster} giving sampling weights for the background. Only used if \code{x} is a SpatRaster and \code{a} is \code{NULL} to draw background points with probability proportional to the bias cell values. This is equivalent to MaxEnt's own \code{biasfile=} option, which is not supported here}
 
-\item{args}{character. Additional argument that can be passed to MaxEnt. See the MaxEnt help for more information. The R MaxEnt function only uses the arguments relevant to model fitting. There is no point in using args='outputformat=raw' when *fitting* the model; but you can use arguments relevant for *prediction* when using the predict function. Some other arguments do not apply at all to the R implementation. An example is 'outputfiletype', because the 'predict' function has its own 'filename' argument for that}
+\item{args}{character. Additional argument that can be passed to MaxEnt. See the MaxEnt help for more information. The R MaxEnt function only uses the arguments relevant to model fitting. There is no point in using args='outputformat=raw' when *fitting* the model; but you can use arguments relevant for *prediction* when using the predict function. Some other arguments do not apply at all to the R implementation. An example is 'outputfiletype', because the 'predict' function has its own 'filename' argument for that. Note that \code{biasfile=...} in \code{args} is not supported; use the \code{biasfile} argument instead}
 
 \item{removeDuplicates}{Boolean. If \code{TRUE}, duplicate presence points (that fall in the same grid cell) are removed}
 

@@ -100,10 +100,49 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 } 
 
 
+.maxentFailedMsg <- function(dirout) {
+	logf <- file.path(dirout, "maxent.log")
+	if (!file.exists(logf)) {
+		return(paste0("MaxEnt failed (no log file at '", logf, "')"))
+	}
+	lines <- tryCatch(readLines(logf, warn=FALSE), error=function(e) character())
+	errlines <- grep("^(Error|Exception)", lines, value=TRUE)
+	if (length(errlines) > 0) {
+		return(paste0("MaxEnt failed:\n  ", paste(errlines, collapse="\n  "),
+			"\n(full log: '", logf, "')"))
+	}
+	if (length(lines) == 0) {
+		return(paste0("MaxEnt failed (empty log at '", logf, "')"))
+	}
+	n <- min(20, length(lines))
+	paste0("MaxEnt failed. Tail of '", logf, "':\n  ",
+		paste(utils::tail(lines, n), collapse="\n  "))
+}
+
+
+.biasBackground <- function(x, nbg, biasfile) {
+	if (!inherits(biasfile, "SpatRaster")) {
+		stop("'biasfile' must be a SpatRaster")
+	}
+	biasfile <- biasfile[[1]]
+	compareGeom(biasfile, x[[1]], stopOnError=TRUE)
+	bpts <- spatSample(biasfile, nbg, method="weights", na.rm=TRUE, as.points=TRUE, values=FALSE, warn=FALSE)
+	av <- extract(x, bpts, ID=FALSE)
+	stats::na.omit(av)
+}
+
+
 #factors=NULL, 
 setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"), 
-	function(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, ...) {
+	function(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, biasfile=NULL, ...) {
 
+		dots <- list(...)
+		if (!is.null(dots$args)) { #redundant with <data.frame> method check but nice to catch early
+			bi <- grep("^biasfile=", trimws(dots$args), ignore.case=TRUE)
+			if (length(bi) > 0) {
+				stop("args='biasfile=..' cannot be used here. Either use the 'biasfile' argument directly\nor supply a bias-weighted background via 'a'.", call.=FALSE)
+			}
+		}
 		p <- predicts:::.getMatrix(p)
 		if (removeDuplicates) {
 			cells <- unique(cellFromXY(x, p))
@@ -124,6 +163,9 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 		} 
 		
 		if (!is.null(a) ) {
+			if (!is.null(biasfile)) {
+				stop("'biasfile' cannot be used as background points 'a' were supplied (draw 'a' with the bias grid as sampling weights?)") 
+			}
 			a <- .getMatrix(a)
 			av <- extract(x, a)
 			avr <- nrow(av)
@@ -137,7 +179,7 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 				}
 			}
 		} else { 
-		# random background
+		# (bias-weighted) random background
 			if (is.null(nbg)) {
 				nbg <- 10000 
 			} else {
@@ -147,12 +189,16 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 					warning("number of background points is very low")
 				}
 			}
-			av <- spatSample(x, nbg, "random", na.rm=TRUE, warn=FALSE)
+			if (is.null(biasfile)) {
+				av <- spatSample(x, nbg, "random", na.rm=TRUE, warn=FALSE)
+			} else {
+				av <- .biasBackground(x, nbg, biasfile)
+			}
 			if (nrow(av) < 100) {
-				stop("only got:", nrow(av), "random background point values; is there a layer with many NA values?")
+				stop("only got: ", nrow(av), " random background point values; is there a layer with many NA values?")
 			}
 			if (nrow(av) < 1000) {
-				warning("only got:", nrow(av), "random background point values; Small exent? Or is there a layer with many NA values?")
+				warning("only got: ", nrow(av), " random background point values; Small exent? Or is there a layer with many NA values?")
 			}
 		}
 		
@@ -194,6 +240,12 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 
 		x <- cbind(p, x)
 		x <- stats::na.omit(x)
+
+		bi <- grep("^biasfile=", trimws(args), ignore.case=TRUE)
+		if (length(bi) > 0) {
+			stop("'biasfile=' cannot be used here. Either use the 'biasfile' argument\nin the MaxEnt<SpatRaster> method or supply a bias-weighted background via 'a'.", call.=FALSE)
+		}
+
 		nodata <- grep("nodata=", args, value=TRUE)
 		if (length(nodata) == 1) {
 			nodata = as.numeric(strsplit(nodata, "=")[[1]][2])
@@ -232,6 +284,9 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 				stop("cannot create output directory: ", f)
 			}
 		}
+		#file.remove(file.path(dirout, "maxent.html"))
+
+		
 		me@path <- dirout
 		
 		pv <- x[p==1, ,drop=FALSE]
@@ -260,36 +315,36 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 			str <- rJava::.jcall(mxe, "S", "fit", c("autorun", "-e", afn, "-o", dirout, "-s", pfn, args), rJava::.jarray(factors))
 		}
 		if (!is.null(str)) {
-			stop("args not understood:\n", str)
+			stop(paste0("args not understood:\n", str))
 		}
 
 	
 		if (replicates > 1) {
 		
 			mer <- new("MaxEnt_model_replicates")
-			d <- t(utils::read.csv(paste(dirout, "/maxentResults.csv", sep="") ))
+			d <- t(utils::read.csv(file.path(dirout, "maxentResults.csv")))
 			d1 <- d[1,]
 			d <- d[-1, ,drop=FALSE]
 			dd <- matrix(as.numeric(d), ncol=ncol(d))
 			rownames(dd) <- rownames(d)
 			colnames(dd) <- d1
 			mer@results <- dd
-			f <- paste(dirout, "/species.html", sep="")
+			f <- file.path(dirout, "species.html")
 			html <- readLines(f)
 			html[1] <- "<title>Maxent model</title>"
 			html[2] <- "<CENTER><H1>Maxent model</H1></CENTER>"
 			html[3] <- sub("model for species", "model result", html[3])
 			newtext <- paste("using 'predicts' version ", utils::packageDescription("predicts")$Version, "& Maxent version")
 			html[3] <- sub("using Maxent version", newtext, html[3])
-			f <- paste(dirout, "/maxent.html", sep="")
+			f <- file.path(dirout, "maxent.html")
 			writeLines(html, f)	
-			mer@html <- f
-			
+			mer@html <- normalizePath(f)
+						
 			for (i in 0:(replicates-1)) {	
 				mex <- me
-				mex@lambdas <- unlist( readLines( paste(dirout, "/species_", i, ".lambdas", sep="") ) )
+				mex@lambdas <- unlist( readLines( file.path(dirout, paste0("species_", i, ".lambdas") ) ))
 					
-				f <- paste(mex@path, "/species_", i, ".html", sep="")
+				f <- file.path(mex@path, paste0("species_", i, ".html"))
 				html <- readLines(f)
 				html[1] <- "<title>Maxent model</title>"
 				html[2] <- "<CENTER><H1>Maxent model</H1></CENTER>"
@@ -298,7 +353,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 				html[3] <- sub("using Maxent version", newtext, html[3])
 				f <- paste(mex@path, "/maxent_", i, ".html", sep="")
 				writeLines(html, f)
-				mex@html <- f
+				mex@html <- normalizePath(f)
 				mer@models[[i+1]] <- mex
 				mer@models[[i+1]]@results <- dd[, 1+1, drop=FALSE]				
 			}
@@ -307,24 +362,28 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 			
 		} else {
 			
-			me@lambdas <- unlist( readLines( paste(dirout, "/species.lambdas", sep="") ) )
-			d <- t(utils::read.csv(paste(dirout, "/maxentResults.csv", sep="") ))
+			flambdas <- file.path(dirout, "species.lambdas")
+			if (!file.exists(flambdas)) {
+				stop(.maxentFailedMsg(dirout), call.=FALSE)
+			}
+			me@lambdas <- unlist( readLines( flambdas ) )
+			d <- t(utils::read.csv(file.path(dirout, "maxentResults.csv") ))
 			d <- d[-1, ,drop=FALSE]
 			d[d=="na"] <- NA
 			dd <- matrix(as.numeric(d))
 			rownames(dd) <- rownames(d)
 			me@results <- dd
 			
-			f <- paste(me@path, "/species.html", sep="")
+			f <- file.path(me@path, "species.html")
 			html <- readLines(f)
 			html[1] <- "<title>Maxent model</title>"
 			html[2] <- "<CENTER><H1>Maxent model</H1></CENTER>"
 			html[3] <- sub("model for species", "model result", html[3])
 			newtext <- paste("using 'predicts' version ", utils::packageDescription("predicts")$Version, "& Maxent version")
 			html[3] <- sub("using Maxent version", newtext, html[3])
-			f <- paste(me@path, "/maxent.html", sep="")
+			f <- file.path(me@path, "maxent.html")
 			writeLines(html, f)	
-			me@html <- f
+			me@html <- normalizePath(f)
 		}
 		
 		me
