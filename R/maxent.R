@@ -119,14 +119,34 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 		paste(utils::tail(lines, n), collapse="\n  "))
 }
 
+.get_path <- function(path) {
+	if (!is.null(path)) {
+		path <- trimws(path)
+		dir.create(path, recursive=TRUE, showWarnings=FALSE)
+		if (!dir.exists(path)) {
+			stop("cannot create output directory: ", path)
+		}
+	} else {
+		path <- .meTmpDir()
+		f <- paste(round(stats::runif(10)*10), collapse="")
+		path <- paste(path, "/", f, sep="")
+		dir.create(path, recursive=TRUE, showWarnings=FALSE)
+		if (!dir.exists(path)) {
+			stop("cannot create output directory: ", f)
+		}
+	}
+	#file.remove(file.path(path, "maxent.html"))
+	path
+}
 
-.biasBackground <- function(x, nbg, biasfile) {
+.biasBackground <- function(x, nbg, biasfile, path) {
 	if (!inherits(biasfile, "SpatRaster")) {
 		stop("'biasfile' must be a SpatRaster")
 	}
 	biasfile <- biasfile[[1]]
 	compareGeom(biasfile, x[[1]], stopOnError=TRUE)
 	bpts <- spatSample(biasfile, nbg, method="weights", na.rm=TRUE, as.points=TRUE, values=FALSE, warn=FALSE)
+	utils::write.csv(crds(bpts), file.path(path, "background_locations.csv"), row.names=FALSE)
 	av <- extract(x, bpts, ID=FALSE)
 	stats::na.omit(av)
 }
@@ -134,7 +154,7 @@ setMethod("MaxEnt", signature(x="missing", p="missing"),
 
 #factors=NULL, 
 setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"), 
-	function(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, biasfile=NULL, ...) {
+	function(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, biasfile=NULL, args=NULL, path=NULL, ...) {
 
 		dots <- list(...)
 		if (!is.null(dots$args)) { #redundant with <data.frame> method check but nice to catch early
@@ -143,6 +163,8 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 				stop("args='biasfile=..' cannot be used here. Either use the 'biasfile' argument directly\nor supply a bias-weighted background via 'a'.", call.=FALSE)
 			}
 		}
+		path <- .get_path(path)
+
 		p <- predicts:::.getMatrix(p)
 		if (removeDuplicates) {
 			cells <- unique(cellFromXY(x, p))
@@ -190,9 +212,11 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 				}
 			}
 			if (is.null(biasfile)) {
-				av <- spatSample(x, nbg, "random", na.rm=TRUE, warn=FALSE)
+				av <- spatSample(x, nbg, "random", na.rm=TRUE, warn=FALSE, as.points=TRUE)
+				utils::write.csv(crds(av), file.path(path, "background_locations.csv"), row.names=FALSE)
+				av <- values(av)
 			} else {
-				av <- .biasBackground(x, nbg, biasfile)
+				av <- .biasBackground(x, nbg, biasfile, path)
 			}
 			if (nrow(av) < 100) {
 				stop("only got: ", nrow(av), " random background point values; is there a layer with many NA values?")
@@ -213,7 +237,7 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 #		}
 		
 		p <- c(rep(1, nrow(pv)), rep(0, nrow(av)))
-		MaxEnt(v, p, ...)	
+		MaxEnt(v, p, path=path, args=args, ...)	
 	}
 )
 
@@ -234,7 +258,7 @@ setMethod("MaxEnt", signature(x="SpatRaster", p="ANY"),
 
 
 setMethod("MaxEnt", signature(x="data.frame", p="numeric"), 
-	function(x, p, args=NULL, path, silent=FALSE, ...) {
+	function(x, p, args=NULL, path=NULL, silent=FALSE, ...) {
 	
 		stopifnot(MaxEnt(silent=TRUE))
 
@@ -268,25 +292,7 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 			x[f] <- as.integer(x[[f]])
 		}
 		
-		if (!missing(path)) {
-			path <- trimws(path)
-			dir.create(path, recursive=TRUE, showWarnings=FALSE)
-			if (!file.exists(path)) {
-				stop("cannot create output directory: ", path)
-			}
-			dirout <- path			
-		} else {
-			dirout <- .meTmpDir()
-			f <- paste(round(stats::runif(10)*10), collapse="")
-			dirout <- paste(dirout, "/", f, sep="")
-			dir.create(dirout, recursive=TRUE, showWarnings=FALSE)
-			if (! file.exists(dirout)) {
-				stop("cannot create output directory: ", f)
-			}
-		}
-		#file.remove(file.path(dirout, "maxent.html"))
-
-		
+		dirout <- .get_path(path)
 		me@path <- dirout
 		
 		pv <- x[p==1, ,drop=FALSE]
@@ -299,8 +305,8 @@ setMethod("MaxEnt", signature(x="data.frame", p="numeric"),
 		
 		pfn <- paste(dirout, "/presence", sep="")
 		afn <- paste(dirout, "/background", sep="")
-		utils::write.table(pv, file=pfn, sep=",", row.names=FALSE)
-		utils::write.table(av, file=afn, sep=",", row.names=FALSE)
+		utils::write.csv(pv, file=pfn, row.names=FALSE)
+		utils::write.csv(av, file=afn, row.names=FALSE)
 
 		mxe <- rJava::.jnew("mebridge")
 		

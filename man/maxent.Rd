@@ -7,7 +7,6 @@
 
 \alias{MaxEnt,missing,missing-method}
 \alias{MaxEnt,SpatRaster,ANY-method}
-\alias{MaxEnt,SpatRaster,SpatVector-method}
 \alias{MaxEnt,data.frame,numeric-method}
 
 \alias{MaxEnt_model-class}
@@ -24,7 +23,8 @@ This function uses the MaxEnt species distribution model software by Phillips, D
 }
 
 \usage{
-\S4method{MaxEnt}{SpatRaster,SpatVector}(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, biasfile=NULL, ...)
+\S4method{MaxEnt}{SpatRaster,ANY}(x, p, a=NULL, removeDuplicates=TRUE, nbg=10000, 
+		biasfile=NULL, args=NULL, path=NULL, ...)
 
 \S4method{MaxEnt}{data.frame,numeric}(x, p, args=NULL, path, silent=FALSE, ...)
 
@@ -42,7 +42,7 @@ If \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 
 \item{nbg}{Number of background points to use. These are sampled randomly from the cells that are not \code{NA} in the first predictor variable. Ignored if background points are specified with argument \code{a}} 
 
-\item{biasfile}{Optional \code{SpatRaster} giving sampling weights for the background. Only used if \code{x} is a SpatRaster and \code{a} is \code{NULL} to draw background points with probability proportional to the bias cell values. This is equivalent to MaxEnt's own \code{biasfile=} option, which is not supported here}
+\item{biasfile}{Optional \code{SpatRaster} giving sampling weights for the background data. Only used if \code{x} is a SpatRaster and \code{a} is \code{NULL} to draw background points with probability proportional to the (non-negative) cell values. This is equivalent to MaxEnt's own \code{biasfile=} option, which is not supported here}
 
 \item{args}{character. Additional argument that can be passed to MaxEnt. See the MaxEnt help for more information. The R MaxEnt function only uses the arguments relevant to model fitting. There is no point in using args='outputformat=raw' when *fitting* the model; but you can use arguments relevant for *prediction* when using the predict function. Some other arguments do not apply at all to the R implementation. An example is 'outputfiletype', because the 'predict' function has its own 'filename' argument for that. Note that \code{biasfile=...} in \code{args} is not supported; use the \code{biasfile} argument instead}
 
