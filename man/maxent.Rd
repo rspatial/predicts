@@ -19,7 +19,7 @@ Build a "maxent" (Maximum Entropy) species distribution model. The function uses
 
 Background points are sampled randomly from the cells that are not \code{NA} in the first predictor variable, unless background points are specified with argument \code{a}. 
 
-This function uses the MaxEnt species distribution model software by Phillips, Dudik and Schapire available \href{here}{https://biodiversityinformatics.amnh.org/open_source/maxent/}.
+This function uses the MaxEnt species distribution model software by Phillips, Dudik and Schapire available \href{https://biodiversityinformatics.amnh.org/open_source/maxent/}{here}.
 }
 
 \usage{
