@@ -1,5 +1,5 @@
 
-divider <- function(x, n, env=NULL, alpha=1, ...) {
+.divider <- function(x, n, env=NULL, alpha=1, ...) {
 	stopifnot(geomtype(x) == "polygons")
 	n <- round(n)
 	stopifnot(n > 0)
@@ -29,7 +29,7 @@ divider <- function(x, n, env=NULL, alpha=1, ...) {
 
 
 
-stripper <- function(x, f=c(1/3, 2/3), vertical=TRUE){
+.stripper <- function(x, f=c(1/3, 2/3), vertical=TRUE){
 
 	if ((any(f <= 0)) || (any(f >= 1))) {
 		stop("f values must be > 0 and < 1")
