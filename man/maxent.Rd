@@ -40,7 +40,7 @@ If \code{x} is a data.frame, \code{p} should be a vector with a length equal to 
 
 \item{a}{Background points. Only used if \code{p} is not a vector and not missing}
 
-\item{nbg}{Number of background points to use. These are sampled randomly from the cells that are not \code{NA} in the first predictor variable. Ignored if background points are specified with argument \code{a}} 
+\item{nbg}{Number of background points to use. These are sampled randomly, without replacement, from the cells that are not \code{NA} in the first predictor variable. Ignored if background points are specified with argument \code{a}} 
 
 \item{biasfile}{Optional \code{SpatRaster} giving sampling weights for the background data. Only used if \code{x} is a SpatRaster and \code{a} is \code{NULL} to draw background points with probability proportional to the (non-negative) cell values. This is equivalent to MaxEnt's own \code{biasfile=} option, which is not supported here}
 
