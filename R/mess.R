@@ -36,9 +36,10 @@ setMethod(
 			if (geomtype(v) != "points") {
 				stop("SpatVector v must have points geometry")
 			}
-			v <- extract(v, x)
+			v <- extract(x, v, ID = FALSE)
 		}
 		v <- stats::na.omit(v)
+		v <- as.matrix(v)
 		if (nrow(v) < 2) {
 			stop("insufficient number of reference points")
 		}

@@ -23,12 +23,6 @@ test_that("mess() rejects non-point SpatVector with an informative error", {
 })
 
 test_that("mess() accepts a point SpatVector without error", {
-  # NOTE: extract(v, x) in the SpatVector branch has arguments reversed;
-  # it should be extract(x, v). That is a separate bug to be fixed.
-  # This test is skipped until that fix is in place.
-  skip(
-    "extract() argument order in SpatVector branch is reversed -- separate bug"
-  )
   r <- make_rast()
   pts <- spatSample(
     r,
@@ -37,6 +31,7 @@ test_that("mess() accepts a point SpatVector without error", {
     as.points = TRUE,
     na.rm = TRUE
   )
+  # Result may be all-NA for a tiny raster; that's OK
   expect_no_error(mess(r, pts))
 })
 
