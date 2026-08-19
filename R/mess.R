@@ -3,38 +3,37 @@
 # rewritten for predicts by RH
 
 .messi <- function(p, v) {
-	
 	v <- sort(v)
 	f <- 100 * findInterval(p, v) / length(v)
 	minv <- v[1]
 	maxv <- v[length(v)]
-	res <- 2*f 
+	res <- 2 * f
 	f[is.na(f)] <- -99
-	i <- f>50 & f<100
-	res[i] <- 200-res[i]
+	i <- f > 50 & f < 100
+	res[i] <- 200 - res[i]
 
-	i <- f==0 
-	res[i] <- 100*(p[i]-minv)/(maxv-minv)
-	i <- f==100
-	res[i] <- 100*(maxv-p[i])/(maxv-minv)
+	i <- f == 0
+	res[i] <- 100 * (p[i] - minv) / (maxv - minv)
+	i <- f == 100
+	res[i] <- 100 * (maxv - p[i]) / (maxv - minv)
 	res
 }
 
 
-.messix <- function(p,v) {
-# a little bit different, no negative values.
+.messix <- function(p, v) {
+	# a little bit different, no negative values.
 	a <- stats::ecdf(v)(p)
-	a[a>0.5] <- 1-a[a>0.5]
+	a[a > 0.5] <- 1 - a[a > 0.5]
 	200 * a
 }
 
 
-
-setMethod("mess", signature(x="SpatRaster"), 
-	function(x, v, full=FALSE, filename="", ...) {
-
+setMethod(
+	"mess",
+	signature(x = "SpatRaster"),
+	function(x, v, full = FALSE, filename = "", ...) {
 		if (inherits(v, "SpatVector")) {
-			if (geomtype(p) != "points") {
+			if (geomtype(v) != "points") {
 				stop("SpatVector v must have points geometry")
 			}
 			v <- extract(v, x)
@@ -53,31 +52,31 @@ setMethod("mess", signature(x="SpatRaster"),
 		if (nl == 1) {
 			names(out) <- "mess"
 			b <- writeStart(out, filename, ...)
-			for (i in 1:b$n) {		
+			for (i in 1:b$n) {
 				vv <- terra::readValues(x, b$row[i], b$nrows[i])
 				p <- .messi(vv, v)
 				terra::writeValues(out, p, b$row[i], b$nrows[i])
 			}
 		} else {
 			if (full) {
-				nlyr(out) <- nl+1
+				nlyr(out) <- nl + 1
 				names(out) <- c(nms, "mess")
 				b <- writeStart(out, filename, ...)
 				for (i in 1:b$n) {
-					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
-					vv <- sapply(1:ncol(v), function(i) .messi(vv[,i], v[,i]))
-					suppressWarnings(m <- apply(vv, 1, min, na.rm=TRUE))
+					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat = TRUE)
+					vv <- sapply(1:ncol(v), function(i) .messi(vv[, i], v[, i]))
+					suppressWarnings(m <- apply(vv, 1, min, na.rm = TRUE))
 					m[!is.finite(m)] <- NA
 					terra::writeValues(out, cbind(vv, m), b$row[i], b$nrows[i])
 				}
-			} else {			
+			} else {
 				nlyr(out) <- 1
 				names(out) <- "mess"
 				b <- writeStart(out, filename, ...)
 				for (i in 1:b$n) {
-					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat=TRUE)
-					vv <- sapply(1:ncol(v), function(i) .messi(vv[,i], v[,i]))
-					suppressWarnings(m <- apply(vv, 1, min, na.rm=TRUE))
+					vv <- terra::readValues(x, b$row[i], b$nrows[i], mat = TRUE)
+					vv <- sapply(1:ncol(v), function(i) .messi(vv[, i], v[, i]))
+					suppressWarnings(m <- apply(vv, 1, min, na.rm = TRUE))
 					m[!is.finite(m)] <- NA
 					terra::writeValues(out, m, b$row[i], b$nrows[i])
 				}
@@ -85,26 +84,22 @@ setMethod("mess", signature(x="SpatRaster"),
 		}
 		writeStop(out)
 		out
-	}	
-)
-
-setMethod("mess", signature(x="data.frame"), 
-	function(x, v, full=FALSE) {
-		if (ncol(x) == 1) {
-			data.frame(mess=.messi(x, v))
-		} else {
-			x <- sapply(1:ncol(x), function(i) .messi(x[,i], v[,i]))
-			rmess <- apply(x, 1, min, na.rm=TRUE)
-			if (full) {
-				out <- data.frame(x, rmess)
-				nms <- paste0(names(x), "_mess")
-				names(out) <- c(nms, "mess")
-				out
-			} else {
-				data.frame(mess=rmess)
-			}
-		}	
 	}
 )
 
-
+setMethod("mess", signature(x = "data.frame"), function(x, v, full = FALSE) {
+	if (ncol(x) == 1) {
+		data.frame(mess = .messi(x[, 1], v[, 1]))
+	} else {
+		x <- sapply(1:ncol(x), function(i) .messi(x[, i], v[, i]))
+		rmess <- apply(x, 1, min, na.rm = TRUE)
+		if (full) {
+			out <- data.frame(x, rmess)
+			nms <- paste0(names(x), "_mess")
+			names(out) <- c(nms, "mess")
+			out
+		} else {
+			data.frame(mess = rmess)
+		}
+	}
+})
